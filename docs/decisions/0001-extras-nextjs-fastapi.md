@@ -11,7 +11,7 @@ The Zoomcamp dashboard is Streamlit in `zoomcamp/dashboard/`, reading MotherDuck
 
 - **`extras/api/` (FastAPI)** is the only backend for the extras product UI. It reads gold MotherDuck marts (metrics now, `/predict` in Phase 3).
 - **`extras/nextjs/` (Next.js)** is the extras product UI. The browser talks **only** to FastAPI. No `MOTHERDUCK_TOKEN` (or TfL keys) in client code.
-- **Streamlit stays the Zoomcamp dashboard.** Next.js never replaces it for graders and is not required for 24/24.
+- **Streamlit stays the Zoomcamp dashboard.** Next.js never replaces it for graders and is not required for the course project.
 - FastAPI and Next.js stay off `zoomcamp/docker-compose.yml`.
 - Build order: Phase 1 Zoomcamp slice → FastAPI metrics → Next.js on that API → ML → `/predict` + Next.js predict view. See [docs/phases.md](../phases.md).
 

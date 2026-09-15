@@ -1,24 +1,20 @@
-# TransitPulse — Cloud 4/4 + Free Public Demo
+# TransitPulse — Cloud VM + Free Public Demo
 
 Visual A→Z flows: **[diagrams.md](./diagrams.md)**
 
-How to earn Zoomcamp **Cloud = 4 points** (cloud + IaC) at $0, **and** how to put a lightweight demo on the internet with **GitHub + Streamlit Cloud + MotherDuck** (no always-on Spark/Flink required).
+How to run the course stack **in the cloud with Terraform** at $0, **and** how to put a lightweight demo on the internet with **GitHub + Streamlit Cloud + MotherDuck** (no always-on Spark/Flink required).
 
 ---
 
-## What Zoomcamp wants for Cloud points
+## What we ship for cloud
 
-| Score | Meaning |
-|------:|---------|
-| 0 | Runs only on your laptop |
-| 2 | Developed in the cloud |
-| **4** | Developed in the cloud **and** IaC (Terraform / Pulumi / CloudFormation / OCI Resource Manager) |
-
-**MotherDuck alone** may or may not convince a peer reviewer that the *project* is “in the cloud.” Safer for **4/4**: a **free cloud VM** created with **Terraform**, running the **`zoomcamp/`** stack (or at least Airflow + dashboard), documented in the README. FastAPI is extras and is not required for Cloud 4.
+- **Laptop only** is not the cloud story.
+- **MotherDuck alone** may or may not convince a peer reviewer that the *project* is in the cloud.
+- **This project:** a **free cloud VM** created with **Terraform**, running the **`zoomcamp/`** stack (or at least Airflow + dashboard), documented in the README. FastAPI is extras and is not required on the VM.
 
 ---
 
-# Part A — Free VM for Cloud 4/4 (recommended: Oracle Cloud Always Free)
+# Part A — Free VM (recommended: Oracle Cloud Always Free)
 
 ## Why Oracle
 
@@ -73,17 +69,17 @@ docker compose up -d
 
 ### 5. What to run on the free VM (pragmatic)
 
-| Mode | Services on VM | Enough for Cloud 4? |
-|------|----------------|---------------------|
-| **Full** | Entire **`zoomcamp/`** Compose | Yes, if it fits RAM |
-| **Lean (recommended)** | Airflow + **dlt** + MinIO + Streamlit/Metabase; run Flink/Spark on-demand or keep screenshots from local | Yes — still “in the cloud” + Terraform |
+| Mode | Services on VM | Notes |
+|------|----------------|-------|
+| **Full** | Entire **`zoomcamp/`** Compose | If it fits RAM |
+| **Lean (recommended)** | Airflow + **dlt** + MinIO + Streamlit/Metabase; run Flink/Spark on-demand or keep screenshots from local | Still “in the cloud” + Terraform |
 | **Demo-only** | Streamlit talking to MotherDuck | Weak alone for “pipeline in cloud”; pair with Part B + document batch/stream ran in CI/local. FastAPI (`extras/`) is optional and not graded. |
 
 Point warehouse at **MotherDuck free** from the VM (outbound HTTPS). No GCS/Azure needed.
 
 ---
 
-## Terraform (required for the “+ IaC” half of 4 points)
+## Terraform (IaC)
 
 Put under `zoomcamp/terraform/` in the repo. Goal: peer can see **code that creates cloud infra**.
 
@@ -191,7 +187,7 @@ Optional separate workflow: `dbt build` into MotherDuck on `main` using secrets 
 
 ---
 
-# Recommended combo for max points + live link
+# Recommended combo for a live link
 
 | Layer | Choice | Cost |
 |-------|--------|------|
@@ -201,7 +197,7 @@ Optional separate workflow: `dbt build` into MotherDuck on `main` using secrets 
 | CI | GitHub Actions | $0 |
 | Stream/batch heavy jobs | On VM and/or laptop; screenshots in README | $0 |
 
-**Zoomcamp story:** Cloud + Terraform = 4; dashboard URL for peers; full **`zoomcamp/`** pipeline reproducible via Compose. FastAPI is extras.
+**Zoomcamp story:** Terraform + free VM in the cloud; dashboard URL for peers; full **`zoomcamp/`** pipeline reproducible via Compose. FastAPI is extras.
 
 ---
 

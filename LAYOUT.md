@@ -1,6 +1,6 @@
 # TransitPulse — repo layout (Zoomcamp vs extras)
 
-Peers: **grade / review `zoomcamp/`** first. Everything under `extras/` is optional portfolio work and is **not** required for Zoomcamp points.
+Peers: **grade / review `zoomcamp/`** first. Everything under `extras/` is optional portfolio work and is **not** required for the course project.
 
 ```
 transitpulse/
@@ -27,7 +27,7 @@ transitpulse/
     dbt/                    # warehouse transforms + tests
     dashboard/              # Streamlit or Metabase notes — 2 tiles
     sample_data/
-    terraform/              # Phase 1: Oracle Always Free VM (Cloud 4/4)
+    terraform/              # Phase 1: Oracle Always Free VM
 
   extras/                   # ★ PORTFOLIO ONLY — say so in README
     README.md               # “Not required for Zoomcamp grading”
@@ -37,16 +37,16 @@ transitpulse/
     nextjs/                 # product UI — talks only to extras/api/
 ```
 
-## What goes in `zoomcamp/` (rubric)
+## What goes in `zoomcamp/` (course)
 
-| Rubric item | Lives in |
+| Deliverable | Lives in |
 |-------------|----------|
 | Problem description | root `PROJECT.md` + `zoomcamp/README.md` |
 | Ingest batch/stream → **data lake (MinIO)** | `zoomcamp/dlt/`, `zoomcamp/airflow/`, `zoomcamp/spark/`, `zoomcamp/flink/`, `zoomcamp/producers/` |
 | Lake → **warehouse** | `zoomcamp/` load tasks + MotherDuck |
 | **dbt** transforms | `zoomcamp/dbt/` |
 | **Dashboard** ≥2 tiles | `zoomcamp/dashboard/` (reads marts **directly**; do not call `extras/api/`) |
-| Cloud + IaC (Phase 1, Cloud 4/4) | `zoomcamp/terraform/` + [docs/cloud-and-free-demo.md](./docs/cloud-and-free-demo.md) |
+| Cloud + IaC (Phase 1) | `zoomcamp/terraform/` + [docs/cloud-and-free-demo.md](./docs/cloud-and-free-demo.md) |
 | Reproducibility | `zoomcamp/README.md`, `zoomcamp/docker-compose.yml`, `zoomcamp/.env.example` |
 
 ## What goes in `extras/` (tell peers)

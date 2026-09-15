@@ -4,12 +4,12 @@
 **Author:** Zakariae Jaafari  
 **Repo title (recommended):** `transitpulse-london-ops-dashboard`  
 **Repo split:** graded work in `zoomcamp/`; portfolio add-ons in `extras/` — see [LAYOUT.md](./LAYOUT.md).  
-**Constraint:** Local-first / free-tier only (no paid GCS/Azure/AWS lake). Optional free cloud VM + Terraform if chasing Cloud 4/4.  
+**Constraint:** Local-first / free-tier only (no paid GCS/Azure/AWS lake). Phase 1 includes a free cloud VM + Terraform.  
 **Sources:** TfL Open Data + Open-Meteo only.
 
 ---
 
-## 1. Problem description (rubric target: 4/4)
+## 1. Problem description
 
 ### Who has the problem?
 
@@ -45,7 +45,7 @@ TransitPulse is an **end-to-end mobility data platform** for Greater London that
 - Peer can clone the repo, `cd zoomcamp`, `docker compose up`, run one Airflow DAG, build dbt, open the dashboard with 2 clear tiles.
 - README explains lake vs warehouse, batch vs stream, and partition/cluster choices.
 - GitHub Actions CI is green on `main` for the graded path (tests + DAG/dbt/`zoomcamp` compose checks).
-- **Cloud 4/4:** `zoomcamp/terraform/` provisions a free VM; lean graded Compose runs there (laptop slice first).
+- `zoomcamp/terraform/` provisions a free VM; lean graded Compose runs there (laptop slice first).
 
 **Extras (not required for peer grading):**
 
@@ -81,7 +81,7 @@ TransitPulse is an **end-to-end mobility data platform** for Greater London that
 
 ## 3. Pipeline decision: batch **and** stream
 
-Zoomcamp scores **either** batch **or** stream for the ingestion row (max 4). TransitPulse **implements both**; README declares:
+Zoomcamp expects **either** batch **or** stream for ingest. TransitPulse **implements both**; README declares:
 
 - **Primary graded stream path:** producer → **Redpanda** → **PyFlink** → MinIO bronze/silver.
 - **Also implemented batch path:** **Airflow** → **dlt** (TfL/Open-Meteo → MinIO / MotherDuck) → optional **PySpark** → **dbt**.
@@ -122,7 +122,7 @@ Open-Meteo current ──► poller / dlt snapshot ─────────�
 
 | Layer | Technology | Notes for Zoomcamp “Technologies” section |
 |-------|------------|-------------------------------------------|
-| IaC (Phase 1, Cloud 4/4) | Terraform | `zoomcamp/terraform/` → Oracle Always Free VM + lean Compose |
+| IaC (Phase 1) | Terraform | `zoomcamp/terraform/` → Oracle Always Free VM + lean Compose |
 | Orchestration | Apache Airflow | DAGs, UI graph, retries; runs dlt pipelines as tasks |
 | Ingest (batch APIs/files) | **dlt** | Load TfL + Open-Meteo into MinIO/MotherDuck; incremental + schema; https://dlthub.com |
 | Data lake | **MinIO** | S3-compatible; explains “what MinIO is” in README |
@@ -145,7 +145,7 @@ Open-Meteo current ──► poller / dlt snapshot ─────────�
 
 ---
 
-## 5. Data warehouse design (rubric: partitioned + clustered + explanation)
+## 5. Data warehouse design (partitioned + clustered + explanation)
 
 **Target:** MotherDuck database `transitpulse` (or Postgres schemas `raw` / `staging` / `marts`).
 
@@ -164,7 +164,7 @@ Open-Meteo current ──► poller / dlt snapshot ─────────�
 
 ---
 
-## 6. Transformations (rubric: dbt / Spark = 4/4)
+## 6. Transformations
 
 - **PySpark:** bronze→silver for large timetable/GTFS-like extracts; nightly reconcile of stream vs static.  
 - **dbt on MotherDuck:** `staging_*` → `int_*` → `marts_*`; tests `not_null`, `unique`, relationships; docs generated.  
@@ -172,7 +172,7 @@ Open-Meteo current ──► poller / dlt snapshot ─────────�
 
 ---
 
-## 7. Dashboard (rubric: 2 tiles = 4/4)
+## 7. Dashboard (2 tiles)
 
 **Tool:** Metabase (Docker, talks to MotherDuck) **or** Streamlit (Zoomcamp-familiar).
 
@@ -185,27 +185,11 @@ Requirements: clear titles, axis labels, data source reference footnote (“TfL 
 
 ---
 
-## 8. Zoomcamp evaluation self-check
-
-| Criterion | Target | How |
-|-----------|--------|-----|
-| Problem description | 4 | This doc §1 |
-| Cloud | 0 or 4 | **Phase 1 target 4:** Terraform + free VM — [docs/cloud-and-free-demo.md](./docs/cloud-and-free-demo.md) |
-| Ingestion batch **or** stream | 4 | Airflow+**dlt**→lake **and/or** Redpanda+Flink path |
-| Data warehouse | 4 | Partition/cluster + explanation |
-| Transformations | 4 | dbt (+ Spark) |
-| Dashboard | 4 | 2 tiles |
-| Reproducibility | 4 | Clean clone instructions |
-
-**Peer reviews:** evaluate 3 peers for bonus points.
-
----
-
-## 8b. Folder policy (Zoomcamp vs extras)
+## 8. Folder policy (Zoomcamp vs extras)
 
 - Publish one repo; tell peers: **evaluate `zoomcamp/` only**.  
 - Put FastAPI, Next.js, ML under **`extras/`** with a short `extras/README.md` stating they are out of Zoomcamp scope. Next.js talks only to FastAPI.  
-- Keep Cloud/Terraform under `zoomcamp/terraform/` if you claim Cloud 4/4.  
+- Keep Terraform under `zoomcamp/terraform/`.  
 - Details: [LAYOUT.md](./LAYOUT.md).
 
 ---
@@ -272,16 +256,16 @@ Triggers: `push` + `pull_request` to `main`.
 - Store `TFL_APP_KEY`, `MOTHERDUCK_TOKEN` only in GitHub **Secrets**.  
 - Never print secrets in Action logs.
 
-This is **optional for Zoomcamp points** but strongly recommended for the “senior SWE + data” hiring story.
+This is **optional for the course project** but strongly recommended for the “senior SWE + data” hiring story.
 
 ---
 
 ## 12. ML / DL roadmap (same platform — from earlier architecture)
 
 ### Phase 1 — Data platform (Zoomcamp submit)
-Ship `zoomcamp/`: lake → warehouse → dbt → 2-tile **Streamlit** dashboard + CI, then **Terraform → free VM** (`zoomcamp/terraform/`, lean Compose) for Cloud 4/4. Laptop slice **before** `terraform apply`.
+Ship `zoomcamp/`: lake → warehouse → dbt → 2-tile **Streamlit** dashboard + CI, then **Terraform → free VM** (`zoomcamp/terraform/`, lean Compose). Laptop slice **before** `terraform apply`.
 
-Optional in parallel (`extras/`): FastAPI metrics, then Next.js on that API — **not required for 24/24**. Full order: [docs/phases.md](./docs/phases.md).
+Optional in parallel (`extras/`): FastAPI metrics, then Next.js on that API — **not required for the course project**. Full order: [docs/phases.md](./docs/phases.md).
 
 ### Phase 2 — Machine learning
 - Feature mart: recent delay windows, line status severity, weather (precip, wind, temp).  

@@ -16,7 +16,7 @@ Spec: [PROJECT.md](./PROJECT.md). Phases: [docs/phases.md](./docs/phases.md). Li
 
 | Scope | Path | Notes |
 |-------|------|--------|
-| Graded Zoomcamp | `zoomcamp/` | Ingest, lake, warehouse, dbt, 2-tile dashboard, Terraform free VM (Cloud 4/4) |
+| Graded Zoomcamp | `zoomcamp/` | Ingest, lake, warehouse, dbt, 2-tile dashboard, Terraform free VM |
 | Portfolio only | `extras/` | FastAPI (BE) + Next.js (FE) + ML/`/predict` — **not** required for peer grading |
 | As-built docs | `docs/` | Update with every implementation change ([protocol](./docs/README.md)) |
 
@@ -46,7 +46,7 @@ Canonical table: [docs/phases.md](./docs/phases.md).
 | Dashboard | **Streamlit** in `zoomcamp/dashboard/` (graded 2 tiles; reads marts, not extras API) |
 | Product UI | **Next.js** in `extras/nextjs/` → **FastAPI** in `extras/api/` only |
 | Packaging | **uv** (not pip/venv as the default) |
-| IaC | Terraform in `zoomcamp/terraform/` → Oracle Always Free VM (**Phase 1**, Cloud 4/4) |
+| IaC | Terraform in `zoomcamp/terraform/` → Oracle Always Free VM (**Phase 1**) |
 
 **Canonical gold** for dashboard and API = MotherDuck **dbt marts**. MinIO gold files are optional, not the serving source.
 
@@ -71,7 +71,7 @@ Python env: `uv sync` (when `zoomcamp/pyproject.toml` exists).
 
 ## Docs protocol
 
-Any change to stack, contracts, run steps, or rubric mapping updates the matching file under `docs/` **and** `docs/status.md` in the same change. Graded run steps → `zoomcamp/README.md`. Root README only if the clone blurb changes. Follow `.cursor/skills/update-docs`.
+Any change to stack, contracts, run steps, or course deliverables updates the matching file under `docs/` **and** `docs/status.md` in the same change. Graded run steps → `zoomcamp/README.md`. Root README only if the clone blurb changes. Follow `.cursor/skills/update-docs`.
 
 ## Pointers
 

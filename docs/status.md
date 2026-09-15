@@ -26,7 +26,7 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 | Lake | MinIO bronze / silver prefixes |
 | Warehouse | MotherDuck `transitpulse` + **dbt** in `zoomcamp/dbt/` |
 | Dashboard (graded) | `zoomcamp/dashboard/` Streamlit (2 tiles, marts directly) |
-| Cloud (Phase 1) | `zoomcamp/terraform/` → Oracle Always Free VM + lean graded Compose (Cloud 4/4) |
+| Cloud (Phase 1) | `zoomcamp/terraform/` → Oracle Always Free VM + lean graded Compose |
 | API (extras) | `extras/api/` FastAPI `/health` + `/metrics/*` + `/ops/freshness` |
 | UI (extras) | `extras/nextjs/` — browser → FastAPI only |
 | ML (extras) | `extras/ml/` — Phase 2+ |
@@ -38,7 +38,7 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 | Phase | Intent | Status |
 |-------|--------|--------|
 | 0 | Spec, LAYOUT, docs, agent context | Shipped |
-| 1 Zoomcamp | Vertical slice in `zoomcamp/` + Terraform free VM (`zoomcamp/terraform/`) for Cloud 4/4 | Not started |
+| 1 Zoomcamp | Vertical slice in `zoomcamp/` + Terraform free VM (`zoomcamp/terraform/`) | Not started |
 | 1 extras API | FastAPI metrics in `extras/api/` on gold marts | Not started |
 | 1 extras UI | Next.js in `extras/nextjs/` calling FastAPI only | Not started |
 | 2 | Feature marts, XGBoost, MLflow, batch scores (`extras/ml/`) | Not started |

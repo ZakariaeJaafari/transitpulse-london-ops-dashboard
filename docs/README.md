@@ -1,6 +1,6 @@
 # TransitPulse docs
 
-Living wiki. **[PROJECT.md](../PROJECT.md)** is the Zoomcamp product spec (stable). This folder is the as-built companion: update it whenever code, contracts, run steps, or rubric mapping change.
+Living wiki. **[PROJECT.md](../PROJECT.md)** is the Zoomcamp product spec (stable). This folder is the as-built companion: update it whenever code, contracts, run steps, or course deliverables change.
 
 Agent briefing: [AGENTS.md](../AGENTS.md). Cursor workflows: `.cursor/skills/` (especially `update-docs`).
 
@@ -14,8 +14,8 @@ Agent briefing: [AGENTS.md](../AGENTS.md). Cursor workflows: `.cursor/skills/` (
 | [data-model.md](./data-model.md) | Keys, grains, partition/cluster, canonical gold |
 | [pipelines.md](./pipelines.md) | Batch vs stream, MinIO prefixes, dlt vs dbt |
 | [serving.md](./serving.md) | Streamlit (graded) + FastAPI BE + Next.js FE |
-| [zoomcamp.md](./zoomcamp.md) | Rubric checklist |
-| [cloud-and-free-demo.md](./cloud-and-free-demo.md) | Cloud 4/4 + Streamlit public demo |
+| [zoomcamp.md](./zoomcamp.md) | Course deliverables |
+| [cloud-and-free-demo.md](./cloud-and-free-demo.md) | Terraform VM + Streamlit public demo |
 | [decisions/](./decisions/README.md) | ADRs |
 
 Human landing page: [README.md](../README.md). Folder split: [LAYOUT.md](../LAYOUT.md) (`zoomcamp/` graded, `extras/` portfolio).
@@ -30,7 +30,7 @@ In the **same change** as the code or architecture edit:
 2. Always refresh [status.md](./status.md) (what exists vs still target).
 3. Edit **[zoomcamp/README.md](../zoomcamp/README.md)** if compose, `.env.example`, Makefile, or graded ports change. Edit root [README.md](../README.md) if the clone/run blurb or folder-split story changes.
 4. Edit [extras/README.md](../extras/README.md) if FastAPI/Next.js/ML run steps change.
-5. Edit [PROJECT.md](../PROJECT.md) **only** if the product spec itself changed (sources, phases, rubric story).
+5. Edit [PROJECT.md](../PROJECT.md) **only** if the product spec itself changed (sources, phases, course story).
 6. Edit [LAYOUT.md](../LAYOUT.md) if folders move.
 
 | If you changed… | Also update |
@@ -42,7 +42,7 @@ In the **same change** as the code or architecture edit:
 | Compose, Makefile, `.env.example`, ports | [zoomcamp/README.md](../zoomcamp/README.md), root [README.md](../README.md) how-to-run, [status.md](./status.md) |
 | Folder split / where code lives | [LAYOUT.md](../LAYOUT.md) |
 | Terraform, Oracle VM, Streamlit Cloud | [cloud-and-free-demo.md](./cloud-and-free-demo.md), [status.md](./status.md) |
-| Rubric mapping, submit checklist | [zoomcamp.md](./zoomcamp.md) |
+| Course deliverables, submit checklist | [zoomcamp.md](./zoomcamp.md) |
 | A durable design choice | New ADR under [decisions/](./decisions/README.md) |
 | End-to-end flow | [diagrams.md](./diagrams.md) |
 

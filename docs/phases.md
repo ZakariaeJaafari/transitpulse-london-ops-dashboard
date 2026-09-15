@@ -20,7 +20,7 @@ flowchart LR
 | Phase | Folder | Ship | Not this phase |
 |-------|--------|------|----------------|
 | **0** | root + `docs/` | Spec, LAYOUT, agent docs | Pipeline code |
-| **1 Zoomcamp** | `zoomcamp/` | One ingest path → MinIO → MotherDuck → dbt → **2 Streamlit tiles** + CI, then **Terraform → free VM** (`zoomcamp/terraform/`) running **lean** graded Compose for Cloud 4/4 | FastAPI, Next.js, ML; stuffing every container onto the VM |
+| **1 Zoomcamp** | `zoomcamp/` | One ingest path → MinIO → MotherDuck → dbt → **2 Streamlit tiles** + CI, then **Terraform → free VM** (`zoomcamp/terraform/`) running **lean** graded Compose | FastAPI, Next.js, ML; stuffing every container onto the VM |
 | **1 extras API** | `extras/api/` | FastAPI reads **gold marts**: `/health`, `/metrics/lines`, `/metrics/reliability/daily`, `/ops/freshness` | Putting API in zoomcamp Compose |
 | **1 extras UI** | `extras/nextjs/` | Next.js product UI that **only** talks to FastAPI (same 2 questions as Streamlit, plus ops/freshness) | Querying MotherDuck from the browser; replacing Streamlit for graders |
 | **2** | `extras/ml/` | Feature marts, XGBoost/sklearn, MLflow, batch scores | `/predict` required for Zoomcamp |

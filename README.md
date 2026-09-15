@@ -29,8 +29,8 @@ Living wiki (update whenever implementation changes): **[docs/](./docs/README.md
 | [docs/data-model.md](./docs/data-model.md) | Keys, grains, partition/cluster |
 | [docs/pipelines.md](./docs/pipelines.md) | Batch vs stream, MinIO, dlt vs dbt |
 | [docs/serving.md](./docs/serving.md) | Streamlit + FastAPI + Next.js |
-| [docs/zoomcamp.md](./docs/zoomcamp.md) | Rubric self-check |
-| [docs/cloud-and-free-demo.md](./docs/cloud-and-free-demo.md) | Cloud 4/4 + public demo |
+| [docs/zoomcamp.md](./docs/zoomcamp.md) | Course deliverables |
+| [docs/cloud-and-free-demo.md](./docs/cloud-and-free-demo.md) | Terraform VM + public demo |
 | [AGENTS.md](./AGENTS.md) / [CLAUDE.md](./CLAUDE.md) | Instructions for coding agents |
 
 Product spec (stable): **[PROJECT.md](./PROJECT.md)**.
@@ -72,7 +72,7 @@ Note: dlt = ingest/load tool; dbt = transform in the warehouse (different tools)
 | ML tracking | **MLflow** (Phase 2+) | **`extras/ml/`** — experiments + model registry |
 | CI/CD | **GitHub Actions** | Lint, tests, `zoomcamp` compose/DAG/dbt checks on every PR |
 | Python packaging | **uv** | Fast, modern envs |
-| IaC (Phase 1) | Terraform | `zoomcamp/terraform/` Oracle Always Free VM for Cloud 4/4 |
+| IaC (Phase 1) | Terraform | `zoomcamp/terraform/` Oracle Always Free VM |
 
 **Medallion:** bronze (raw) → silver (cleaned) → gold (dbt marts).
 
@@ -138,29 +138,13 @@ Optional third: rainfall vs delay scatter (nice-to-have, not required).
 
 ---
 
-## Warehouse partitioning (explain for 4/4)
+## Warehouse partitioning
 
 Dashboard queries filter by **date** and group by **line**. Therefore:
 
 - Fact tables carry `event_date` (or `status_date`) as a **partition key**.  
 - Frequent filters/joins on `line_id` / `stop_id` → **cluster / sort / index** those columns.  
 - Document this next to the dbt models so peer reviewers see intentional design, not accidental tables.
-
----
-
-## Zoomcamp rubric mapping
-
-| Criterion | Max | This project |
-|-----------|-----|----------------|
-| Problem description | 4 | See Problem + `PROJECT.md` |
-| Cloud | 0 or 4 | **Phase 1 target 4:** `zoomcamp/terraform/` + Oracle Always Free VM |
-| Ingestion (batch *or* stream) | 4 | Stream: Redpanda+Flink; Batch: Airflow → **dlt** → MinIO/MD (+ Spark as needed) |
-| Data warehouse | 4 | MotherDuck + partition/cluster explanation |
-| Transformations | 4 | dbt + PySpark |
-| Dashboard | 4 | 2 tiles |
-| Reproducibility | 4 | This README + `zoomcamp/.env.example` + working Compose in `zoomcamp/` |
-
-Evaluate **3 peer projects** for bonus points.
 
 ---
 
@@ -193,7 +177,7 @@ Then:
 
 | Folder | Purpose |
 |--------|---------|
-| **`zoomcamp/`** | Graded course project only — ingest → MinIO lake → MotherDuck → dbt → 2-tile dashboard (+ Terraform if Cloud 4/4) |
+| **`zoomcamp/`** | Graded course project only — ingest → MinIO lake → MotherDuck → dbt → 2-tile dashboard + Terraform free VM |
 | **`extras/`** | Portfolio only — FastAPI **backend** + Next.js **UI**, ML/`/predict`. **Not required for peer grading.** |
 
 See **[LAYOUT.md](./LAYOUT.md)** for the full tree.
@@ -224,7 +208,7 @@ transitpulse/
     dbt/
     dashboard/              # 2 tiles
     sample_data/
-    terraform/              # Phase 1: Oracle Always Free VM (Cloud 4/4)
+    terraform/              # Phase 1: Oracle Always Free VM
   extras/                   # ★ portfolio only (say so to peers)
     README.md
     api/                    # FastAPI backend for nextjs/
@@ -237,7 +221,7 @@ transitpulse/
 
 ## Cloud & free public demo
 
-Step-by-step guide (Oracle Always Free VM + Terraform for Zoomcamp **Cloud 4/4**, and GitHub + Streamlit Community Cloud + MotherDuck for a live dashboard URL):
+Step-by-step guide (Oracle Always Free VM + Terraform, and GitHub + Streamlit Community Cloud + MotherDuck for a live dashboard URL):
 
 → **[docs/cloud-and-free-demo.md](./docs/cloud-and-free-demo.md)**
 
@@ -245,7 +229,7 @@ Step-by-step guide (Oracle Always Free VM + Terraform for Zoomcamp **Cloud 4/4**
 
 ## Cloud note (Phase 1)
 
-Zoomcamp Cloud **4/4** = developed in the cloud **and** IaC. This project targets that in **Phase 1**: Terraform in `zoomcamp/terraform/` → Oracle Always Free VM, lean `zoomcamp/` Compose, MotherDuck as warehouse. Laptop slice first. Details: [docs/cloud-and-free-demo.md](./docs/cloud-and-free-demo.md).
+Phase 1 ships **cloud + IaC**: Terraform in `zoomcamp/terraform/` → Oracle Always Free VM, lean `zoomcamp/` Compose, MotherDuck as warehouse. Laptop slice first. Details: [docs/cloud-and-free-demo.md](./docs/cloud-and-free-demo.md).
 
 ---
 
@@ -259,9 +243,9 @@ Full order: **[docs/phases.md](./docs/phases.md)**.
 - In **`zoomcamp/`**: Airflow + **dlt** + PySpark + Redpanda + PyFlink → MinIO → MotherDuck + dbt
 - Streamlit: **2 tiles** (categorical + temporal) reading gold marts **directly**
 - **GitHub Actions CI** on every push/PR for the graded path (see below)
-- **Terraform** in `zoomcamp/terraform/` → Oracle Always Free VM, **lean** graded Compose (Cloud 4/4). Get the laptop slice working first.
+- **Terraform** in `zoomcamp/terraform/` → Oracle Always Free VM, **lean** graded Compose. Get the laptop slice working first.
 
-### Phase 1 extras — FastAPI then Next.js (not required for 24/24)
+### Phase 1 extras — FastAPI then Next.js (not required for the course project)
 - `extras/api/` FastAPI metrics against gold marts
 - `extras/nextjs/` product UI that **only** calls FastAPI (no MotherDuck token in the browser)
 

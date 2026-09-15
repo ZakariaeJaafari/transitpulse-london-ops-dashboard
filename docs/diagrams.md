@@ -143,6 +143,6 @@ flowchart TD
 1. **Diagram 1** = project journey from idea to prediction.
 2. **Diagram 2** = where bytes move at runtime.
 3. **Diagram 3** = build order.
-4. **Diagram 4** = $0 internet presence + Cloud 4/4 path.
+4. **Diagram 4** = $0 internet presence + Terraform VM path.
 
 Details: [README.md](../README.md) · [PROJECT.md](../PROJECT.md) · [phases.md](./phases.md) · [cloud-and-free-demo.md](./cloud-and-free-demo.md) · [docs index](./README.md)

@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Living docs
 
-After any change to stack, contracts, run steps, or rubric mapping, update in the **same change**:
+After any change to stack, contracts, run steps, or course deliverables, update in the **same change**:
 
 1. The matching page under `docs/` (see `docs/README.md` table).
 2. `docs/status.md` (as-built vs still-target; never leave “target” on shipped work).

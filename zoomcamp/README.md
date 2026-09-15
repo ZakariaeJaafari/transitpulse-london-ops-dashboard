@@ -19,7 +19,7 @@ docker compose up -d
 # Airflow → dlt → dbt → open dashboard/ (2 tiles)
 ```
 
-`.env.example`, Compose, dbt, and Terraform (`terraform/` — Phase 1 Cloud 4/4) all live **here**, not at the repo root.
+`.env.example`, Compose, dbt, and Terraform (`terraform/` — Phase 1 free VM) all live **here**, not at the repo root.
 
 Laptop slice first, then `terraform apply`, then lean Compose on the VM. See [docs/cloud-and-free-demo.md](../docs/cloud-and-free-demo.md).
 
