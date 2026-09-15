@@ -1,0 +1,22 @@
+---
+description: Keep the docs wiki and status.md in sync with code and architecture
+alwaysApply: true
+---
+
+# Living docs
+
+After any change to stack, contracts, run steps, or rubric mapping, update in the **same change**:
+
+1. The matching page under `docs/` (see `docs/README.md` table).
+2. `docs/status.md` (as-built vs still-target; never leave “target” on shipped work).
+
+Also:
+
+- Graded compose / `.env` / Makefile / ports → `zoomcamp/README.md`.
+- Root `README.md` if the clone blurb or folder-split story changes.
+- FastAPI / Next.js / ML run steps → `extras/README.md`.
+- Folder moves → `LAYOUT.md`.
+- `PROJECT.md` only if the product spec changed.
+- New durable choice → ADR in `docs/decisions/`.
+
+Follow `.cursor/skills/update-docs`. Do not invent pipelines in prose that `docs/status.md` does not list as shipped.

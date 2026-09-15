@@ -1,0 +1,22 @@
+---
+description: dbt layers, tests, and warehouse partition/cluster documentation
+globs: "**/dbt/**"
+alwaysApply: false
+---
+
+# dbt + warehouse
+
+Models live in `zoomcamp/dbt/`. Layers: `staging_*` → `int_*` → `marts_*`.
+
+- Tests: `not_null`, `unique`, `relationships` on conformed keys (`line_id`, `stop_id`).
+- Canonical serving tables are **marts** in MotherDuck database `transitpulse`.
+- Document **partition** (date) and **cluster/sort** (`line_id` / `stop_id`) in the model YAML next to the SQL — graders look for the explanation.
+- Facts filter by date and group by line; see `docs/data-model.md` for target grains.
+
+```yaml
+# ✅ GOOD — intent next to the model
+# Partition: event_date. Cluster/sort: line_id, stop_id.
+# Dashboard: last-7-days filter + bar by line.
+```
+
+Do not build marts that read bronze. Follow `.cursor/skills/data-contracts`.

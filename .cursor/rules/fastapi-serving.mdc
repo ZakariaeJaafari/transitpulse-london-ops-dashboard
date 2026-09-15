@@ -1,0 +1,24 @@
+---
+description: FastAPI reads gold marts only; Phase 1 metrics contract
+globs: "**/api/**"
+alwaysApply: false
+---
+
+# FastAPI serving
+
+Code lives in `extras/api/` (portfolio, not Zoomcamp-graded). This is the **backend for `extras/nextjs/`**. Streamlit must not depend on it for Zoomcamp submit.
+
+- Read **gold** MotherDuck marts (or a thin cache), never bronze.
+- Phase 1: `GET /health`, `/metrics/lines`, `/metrics/reliability/daily`, `/ops/freshness`.
+- Timeouts; return **503** if the warehouse is down.
+- No API keys or tokens in JSON. Attribution via `/meta` or a response header.
+- CORS: allow the Next.js origin when that app exists.
+- Phase 3 `POST /predict` only after Phase 1 metrics exist and an ADR covers the feature contract.
+
+```python
+# ❌ BAD
+return {"rows": bronze, "app_key": os.environ["TFL_APP_KEY"]}
+
+# ✅ GOOD
+# query marts.mart_line_reliability_daily; on warehouse error raise HTTP 503
+```

@@ -1,0 +1,22 @@
+---
+description: Airflow DAG conventions for TransitPulse batch ingest
+globs: "**/airflow/**"
+alwaysApply: false
+---
+
+# Airflow DAGs
+
+DAGs live in `zoomcamp/airflow/`. They orchestrate **dlt** (and Spark/dbt), they are not the ingest library.
+
+- Tasks are **idempotent**; set retries on external HTTP/S3 calls.
+- Order: bronze (dlt/raw) → silver (Spark or dlt typed) → warehouse load → `dbt build`.
+- Do not embed TfL keys in DAG source; read env / Airflow Variables / `.env`.
+- Sensors on freshness are optional; keep the first DAG thin enough to demo.
+
+```python
+# ❌ BAD
+download_and_spark_and_dbt = PythonOperator(...)  # one giant task
+
+# ✅ GOOD
+ingest_dlt >> spark_silver >> load_motherduck >> dbt_build
+```

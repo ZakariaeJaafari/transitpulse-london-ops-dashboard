@@ -1,0 +1,22 @@
+---
+description: Python packaging with uv, pytest, no secrets in tests
+globs: "**/*.{py,toml}"
+alwaysApply: false
+---
+
+# Python (uv)
+
+- Manage deps with **uv** (`pyproject.toml`, `uv.lock`). Do not add a parallel pip-only workflow.
+- Tests: **pytest**. Mock TfL/MotherDuck; never read real `.env` secrets in CI.
+- Keep producers, dlt pipelines, and API handlers typed and importable without spinning Compose.
+- Poll a **StopPoint subset**; put fixtures in `zoomcamp/sample_data/`.
+
+```python
+# ❌ BAD
+def test_arrivals():
+    key = os.environ["TFL_APP_KEY"]  # real key in CI
+
+# ✅ GOOD
+def test_arrivals(monkeypatch):
+    monkeypatch.setenv("TFL_APP_KEY", "test-key")
+```
