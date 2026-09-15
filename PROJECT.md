@@ -5,7 +5,7 @@
 **Repo title (recommended):** `transitpulse-london-ops-dashboard`  
 **Repo split:** graded work in `zoomcamp/`; portfolio add-ons in `extras/` — see [LAYOUT.md](./LAYOUT.md).  
 **Constraint:** Local-first / free-tier only (no paid GCS/Azure/AWS lake). Optional free cloud VM + Terraform if chasing Cloud 4/4.  
-**Forbidden dataset:** NYC TLC taxi (Zoomcamp rule).
+**Sources:** TfL Open Data + Open-Meteo only.
 
 ---
 
@@ -55,7 +55,7 @@ TransitPulse is an **end-to-end mobility data platform** for Greater London that
 
 ---
 
-## 2. Dataset selection (not NYC taxi)
+## 2. Dataset selection
 
 | Source | Role | Mode | Access | Official URLs |
 |--------|------|------|--------|----------------|
@@ -74,8 +74,7 @@ TransitPulse is an **end-to-end mobility data platform** for Greater London that
 
 ### Why these sources (peer-review friendly)
 
-- Clearly **not** NYC taxi.
-- Industry-recognizable **transit + weather** join.
+- Industry-recognizable **transit + weather** join (London ops, not a generic tutorial dataset).
 - Mix of **batch files** and **live HTTP APIs** → justifies Airflow + **dlt** + Spark **and** Redpanda + Flink.
 
 ---
@@ -313,7 +312,7 @@ Optional in parallel (`extras/`): FastAPI metrics, then Next.js on that API — 
 
 ## 14. Plagiarism note
 
-Original TransitPulse design for this Zoomcamp iteration. Do not copy other course projects or prior bootcamp repos. NYC taxi not used.
+Original TransitPulse design for this Zoomcamp iteration. Do not copy other course projects or prior bootcamp repos.
 
 ---
 

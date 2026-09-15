@@ -4,8 +4,6 @@
 
 Turn **TfL open data** + **Open-Meteo** weather into a **MinIO data lake**, **MotherDuck** warehouse, **dbt** marts, and a **2-tile dashboard** — with **Airflow**, **dlt** (ingest), **PySpark**, **Redpanda**, and **PyFlink**.
 
-> **Not NYC taxi.** That dataset is disallowed for the Zoomcamp course project.
-
 ---
 
 ## Problem

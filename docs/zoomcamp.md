@@ -2,7 +2,7 @@
 
 Course project for DataTalksClub Data Engineering Zoomcamp. Full spec: [PROJECT.md](../PROJECT.md). Graded code: **`zoomcamp/`**. Portfolio-only: **`extras/`** ([LAYOUT.md](../LAYOUT.md)).
 
-**Forbidden dataset:** NYC TLC taxi (and any NYC taxi variant).
+Sources: TfL Open Data + Open-Meteo.
 
 ## Self-check
 

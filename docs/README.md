@@ -14,7 +14,7 @@ Agent briefing: [AGENTS.md](../AGENTS.md). Cursor workflows: `.cursor/skills/` (
 | [data-model.md](./data-model.md) | Keys, grains, partition/cluster, canonical gold |
 | [pipelines.md](./pipelines.md) | Batch vs stream, MinIO prefixes, dlt vs dbt |
 | [serving.md](./serving.md) | Streamlit (graded) + FastAPI BE + Next.js FE |
-| [zoomcamp.md](./zoomcamp.md) | Rubric checklist (not NYC taxi) |
+| [zoomcamp.md](./zoomcamp.md) | Rubric checklist |
 | [cloud-and-free-demo.md](./cloud-and-free-demo.md) | Cloud 4/4 + Streamlit public demo |
 | [decisions/](./decisions/README.md) | ADRs |
 

@@ -11,7 +11,7 @@ Read [docs/zoomcamp.md](../../../docs/zoomcamp.md) and [PROJECT.md](../../../PRO
 
 | Criterion | Ship |
 |-----------|------|
-| Problem | Who/what/why in README + `PROJECT.md` §1; **not NYC taxi** |
+| Problem | Who/what/why in README + `PROJECT.md` §1 (TfL + weather) |
 | Cloud | **4** in Phase 1: Terraform + free VM (`zoomcamp/terraform/` + [docs/cloud-and-free-demo.md](../../../docs/cloud-and-free-demo.md)) |
 | Ingest | One working **batch or stream** path + README explainer. Both in-repo is extra, not a substitute for one path that runs |
 | Warehouse | MotherDuck + **written** partition/cluster explanation next to dbt models |
@@ -25,7 +25,6 @@ Read [docs/zoomcamp.md](../../../docs/zoomcamp.md) and [PROJECT.md](../../../PRO
 - Wire `zoomcamp/dashboard/` to `extras/api/` for the submit path (tiles must read marts directly).
 - Fail reproducibility with a half-running Airflow+Spark+Flink+Redpanda zoo. Prefer a **vertical slice**.
 - Claim Cloud 4 with MotherDuck alone; pair Terraform + free VM if chasing 4.
-- Use NYC TLC taxi.
 
 ## Before “ready to submit”
 

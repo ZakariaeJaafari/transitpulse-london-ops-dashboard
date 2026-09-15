@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Project core
 
-TransitPulse is a **London TfL + Open-Meteo** lakehouse for DE Zoomcamp + portfolio. **Never** use NYC TLC taxi.
+TransitPulse is a **London TfL + Open-Meteo** lakehouse for DE Zoomcamp + portfolio. Do not add other datasets.
 
 - Spec: `PROJECT.md`. Phases: `docs/phases.md`. As-built: `docs/status.md`. Folders: `LAYOUT.md`.
 - **Graded code** → `zoomcamp/`. **FastAPI / Next.js / ML** → `extras/` (not for peer grading).

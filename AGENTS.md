@@ -7,7 +7,7 @@ Shared instructions for coding agents (Cursor, Codex, Claude Code via `CLAUDE.md
 **TransitPulse** is a Greater London mobility lakehouse: TfL open data + Open-Meteo → MinIO (lake) → MotherDuck (warehouse) → dbt marts → 2-tile dashboard.
 
 - Course: DataTalksClub Data Engineering Zoomcamp (plus a portfolio path).
-- **Forbidden dataset:** NYC TLC taxi (any variant).
+- Sources: TfL Open Data + Open-Meteo only.
 - Constraint: local-first / free-tier only (no paid GCS/Azure/AWS lake).
 
 Spec: [PROJECT.md](./PROJECT.md). Phases: [docs/phases.md](./docs/phases.md). Living wiki: [docs/](./docs/README.md). Folder split: [LAYOUT.md](./LAYOUT.md).

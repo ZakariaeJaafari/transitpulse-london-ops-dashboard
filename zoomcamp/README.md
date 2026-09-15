@@ -4,7 +4,7 @@ This folder is the **DataTalksClub DE Zoomcamp course project**.
 
 ## Graded path
 
-Dataset (TfL + Open-Meteo, **not** NYC taxi) → **data lake (MinIO)** → **warehouse (MotherDuck)** → **dbt** → **dashboard (2 tiles)**.
+Dataset (TfL + Open-Meteo) → **data lake (MinIO)** → **warehouse (MotherDuck)** → **dbt** → **dashboard (2 tiles)**.
 
 Orchestration: Airflow. Batch ingest: **dlt** (+ PySpark as needed). Stream (optional track): Redpanda + PyFlink.
 
