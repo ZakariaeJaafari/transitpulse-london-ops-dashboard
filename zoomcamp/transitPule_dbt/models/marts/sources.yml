@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: bronze
+    schema: bronze
+    tables:
+      - name: tfl_line_status
+      - name: tfl_line_status__line_statuses
+      - name: tfl_line_status__line_statuses__validity_periods
+      - name: _dlt_loads
+      - name: weather_hourly

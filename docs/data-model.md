@@ -48,4 +48,11 @@ MotherDuck/DuckDB: partition **columns** + intentional `ORDER BY` / indexes. Pos
 
 `staging_*` → `int_*` → `marts_*` with `not_null`, `unique`, and `relationships` tests.
 
-As-built schemas: none yet — see [status.md](./status.md).
+### As-built (local DuckDB)
+
+| Object | Grain | Notes |
+|--------|-------|--------|
+| `marts.line_status_snapshot` | line × `status_date` | TfL line status picker from bronze dlt tables |
+| `marts.weather_hourly` | one row per hour | `time` in Europe/London local; Open-Meteo fields from `bronze.weather_hourly` |
+
+Column docs: `zoomcamp/transitPule_dbt/models/marts/schema.yml`. MotherDuck marts not built yet — see [status.md](./status.md).

@@ -10,7 +10,38 @@ Orchestration: Airflow. Batch ingest: **dlt** (+ PySpark as needed). Stream (opt
 
 ## How to run
 
-(Fill as you implement.) Commands below assume you are **in this folder** (`zoomcamp/`).
+Commands below assume you are **in this folder** (`zoomcamp/`).
+
+**As-built (local laptop):**
+
+MinIO lake (API `9000`, console `9001`):
+
+```bash
+cd zoomcamp
+cp .env.example .env   # add MINIO_ROOT_USER / MINIO_ROOT_PASSWORD (and other keys)
+docker compose up -d
+uv sync
+uv run python lake/upload_bronze.py
+# Console: http://localhost:9001 → bucket transitpulse → bronze/…
+```
+
+DuckDB warehouse path (no MinIO required):
+
+```bash
+cd zoomcamp
+uv sync
+uv run python ingest/tfl_line_status_dlt.py
+uv run python ingest/weather_hourly_dlt.py
+cd transitPule_dbt
+uv run dbt run --profiles-dir . --select line_status_snapshot weather_hourly
+uv run dbt test --profiles-dir . --select line_status_snapshot weather_hourly
+cd ..
+uv run streamlit run dashboard/app.py
+```
+
+Warehouse: `data/transitpulse.duckdb` (`bronze.*`, `marts.*` views). Dashboard reads `marts.*` read-only.
+
+**Target (not all shipped yet):**
 
 ```bash
 cd zoomcamp

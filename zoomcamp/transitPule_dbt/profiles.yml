@@ -1,0 +1,8 @@
+transitPule_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ../data/transitpulse.duckdb
+      schema: marts
+      threads: 1

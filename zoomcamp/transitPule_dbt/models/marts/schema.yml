@@ -1,0 +1,55 @@
+version: 2
+
+models:
+  - name: line_status_snapshot
+    description: >
+      Grain: one row per line_id and status_date. Current status per Tube line
+      per dlt load date, from bronze TfL line-status tables. Picker matches
+      zoomcamp/ingest/line_status_proxy.py.
+    columns:
+      - name: line_id
+        description: >
+          TfL line identifier from parent bronze.tfl_line_status.id (not the
+          child line_statuses.line_id column, which is null on Good Service).
+        tests:
+          - not_null
+          - unique
+      - name: status_severity
+        description: >
+          TfL status severity code for the picked status; lower values are worse.
+          Good Service is 10.
+      - name: status_description
+        description: >
+          Human-readable severity label from status_severity_description; empty
+          string when the source field is null.
+      - name: disrupted
+        description: >
+          Disruption proxy: true when status_severity is not 10 (Good Service).
+          Not timetable delay — see docs/data-model.md.
+        tests:
+          - not_null
+      - name: status_date
+        description: >
+          Calendar date of the dlt load (cast from bronze._dlt_loads.inserted_at
+          for the row's _dlt_load_id), not TfL line created.
+        tests:
+          - not_null
+
+  - name: weather_hourly
+    description: >
+      Grain: one row per hour. London Open-Meteo hourly forecast from
+      bronze.weather_hourly (sample london_weather_2026-10-27.json).
+    columns:
+      - name: time
+        description: >
+          Hour start in Europe/London local time (matches Open-Meteo hourly.time
+          strings, e.g. 2026-10-27T00:00).
+        tests:
+          - not_null
+          - unique
+      - name: temperature_2m
+        description: Air temperature at 2 m in degrees Celsius.
+      - name: precipitation
+        description: Hourly precipitation total in mm.
+      - name: wind_speed_10m
+        description: Wind speed at 10 m in km/h.
