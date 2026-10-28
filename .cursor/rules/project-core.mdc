@@ -11,7 +11,7 @@ TransitPulse is a **London TfL + Open-Meteo** lakehouse for DE Zoomcamp + portfo
 - **Graded code** → `zoomcamp/`. **FastAPI / Next.js / ML** → `extras/` (not for peer grading).
 - Extras UI = **Next.js → FastAPI only** (no MotherDuck token in the browser). Streamlit stays the Zoomcamp dashboard.
 - Compose, dbt, Airflow, `.env.example`, Terraform: working directory **`zoomcamp/`**. Never add `extras/` services to `zoomcamp/docker-compose.yml`.
-- **Phase 1 first:** laptop slice in `zoomcamp/` (ingest → lake → warehouse → 2 tiles + CI), then **Terraform free VM** (`zoomcamp/terraform/`, lean Compose). Dashboard reads marts **directly**. Do not require FastAPI for the Zoomcamp course project.
+- **Phase 1 first:** laptop slice in `zoomcamp/` (ingest → lake → warehouse → 2 tiles + CI), then **Terraform Azure credit VM** (`zoomcamp/terraform/`, lean Compose). The $100 credit pays for that VM only. Lake stays MinIO (no Azure Blob). Dashboard reads marts **directly**. Do not require FastAPI for the Zoomcamp course project.
 - **Canonical gold** = MotherDuck **dbt marts**. Dashboard and API read gold only, not bronze.
 - **dlt** = ingest/load. **dbt** = warehouse SQL. Do not mix the names.
 - Python packaging: **uv**, not pip/venv as the default.

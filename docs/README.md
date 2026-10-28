@@ -41,7 +41,7 @@ In the **same change** as the code or architecture edit:
 | Phase order / what ships when | [phases.md](./phases.md), [status.md](./status.md) |
 | Compose, Makefile, `.env.example`, ports | [zoomcamp/README.md](../zoomcamp/README.md), root [README.md](../README.md) how-to-run, [status.md](./status.md) |
 | Folder split / where code lives | [LAYOUT.md](../LAYOUT.md) |
-| Terraform, Oracle VM, Streamlit Cloud | [cloud-and-free-demo.md](./cloud-and-free-demo.md), [status.md](./status.md) |
+| Terraform, Azure VM, Streamlit Cloud | [cloud-and-free-demo.md](./cloud-and-free-demo.md), [status.md](./status.md) |
 | Course deliverables, submit checklist | [zoomcamp.md](./zoomcamp.md) |
 | A durable design choice | New ADR under [decisions/](./decisions/README.md) |
 | End-to-end flow | [diagrams.md](./diagrams.md) |

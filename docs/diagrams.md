@@ -20,7 +20,7 @@ flowchart TD
   G --> H[Transform: dbt staging → marts]
   H --> I["Dashboard 2 tiles zoomcamp/dashboard"]
   I --> K[CI: GitHub Actions on zoomcamp]
-  K --> L[Deploy free: Streamlit Cloud + optional Oracle VM]
+  K --> L[Deploy: Streamlit Cloud + Azure credit VM]
   H --> J["extras FastAPI /health + /metrics"]
   J --> NJS["extras Next.js product UI"]
   H --> M["extras Phase 2: features + train XGBoost"]
@@ -112,7 +112,7 @@ Full table: [phases.md](./phases.md).
 
 | Phase | You ship | Not required for Zoomcamp submit |
 |-------|----------|----------------------------------|
-| **1 Zoomcamp** | Ingest → lake → DWH → dbt → 2 Streamlit tiles + CI + **Terraform free VM** in `zoomcamp/` | FastAPI, Next.js, ML |
+| **1 Zoomcamp** | Ingest → lake → DWH → dbt → 2 Streamlit tiles + CI + **Terraform Azure credit VM** in `zoomcamp/` | FastAPI, Next.js, ML |
 | **1 extras API** | FastAPI `/metrics/*` | Graded dashboard |
 | **1 extras UI** | Next.js → FastAPI only | Replacing Streamlit for graders |
 | **2** | Features, XGBoost, MLflow, batch scores in `extras/ml/` | Public `/predict` |
@@ -129,8 +129,8 @@ flowchart TD
   MD --> FA[Optional extras FastAPI]
   FA --> NX[Optional extras Next.js]
   REPO --> TF[Terraform]
-  TF --> OCI[Oracle Always Free VM]
-  OCI --> COMPOSE["zoomcamp Compose: Airflow dlt MinIO Redpanda Flink dashboard"]
+  TF --> AZ[Azure credit VM]
+  AZ --> COMPOSE["zoomcamp Compose: Airflow dlt MinIO dashboard"]
   COMPOSE --> MD
   SC --> PEERS[Peer reviewers click link]
   NX --> PEERS
@@ -143,6 +143,6 @@ flowchart TD
 1. **Diagram 1** = project journey from idea to prediction.
 2. **Diagram 2** = where bytes move at runtime.
 3. **Diagram 3** = build order.
-4. **Diagram 4** = $0 internet presence + Terraform VM path.
+4. **Diagram 4** = Streamlit Cloud at $0, plus the Azure credit VM.
 
 Details: [README.md](../README.md) · [PROJECT.md](../PROJECT.md) · [phases.md](./phases.md) · [cloud-and-free-demo.md](./cloud-and-free-demo.md) · [docs index](./README.md)

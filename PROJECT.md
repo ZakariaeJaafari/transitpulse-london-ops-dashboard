@@ -4,7 +4,7 @@
 **Author:** Zakariae Jaafari  
 **Repo title (recommended):** `transitpulse-london-ops-dashboard`  
 **Repo split:** graded work in `zoomcamp/`; portfolio add-ons in `extras/` — see [LAYOUT.md](./LAYOUT.md).  
-**Constraint:** Local-first / free-tier only (no paid GCS/Azure/AWS lake). Phase 1 includes a free cloud VM + Terraform.  
+**Constraint:** Local-first lake (no paid GCS, Azure Blob, or AWS S3). Phase 1 compute is one Azure VM paid from a $100 credit, created with Terraform. Warehouse target remains MotherDuck.  
 **Sources:** TfL Open Data + Open-Meteo only.
 
 ---
@@ -122,7 +122,7 @@ Open-Meteo current ──► poller / dlt snapshot ─────────�
 
 | Layer | Technology | Notes for Zoomcamp “Technologies” section |
 |-------|------------|-------------------------------------------|
-| IaC (Phase 1) | Terraform | `zoomcamp/terraform/` → Oracle Always Free VM + lean Compose |
+| IaC (Phase 1) | Terraform | `zoomcamp/terraform/` → Azure VM ($100 credit) + lean Compose. Lake stays MinIO. |
 | Orchestration | Apache Airflow | DAGs, UI graph, retries; runs dlt pipelines as tasks |
 | Ingest (batch APIs/files) | **dlt** | Load TfL + Open-Meteo into MinIO/MotherDuck; incremental + schema; https://dlthub.com |
 | Data lake | **MinIO** | S3-compatible; explains “what MinIO is” in README |

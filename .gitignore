@@ -36,7 +36,22 @@ logs/
 .DS_Store
 Thumbs.db
 *.swp
+# Git Bash creates a real file named nul
+nul
+
+# dbt machine id
+.user.yml
+
+# SSH key if ssh-keygen is run inside the repo
+zack-transitpulse
+zack-transitpulse.pub
 
 # Local editor / MCP (machine-specific)
 .cursor/mcp.json
 .vscode/
+
+# Local DuckDB warehouse (dlt + dbt); never commit
+*.duckdb
+*.duckdb.wal
+zoomcamp/data/*
+!zoomcamp/data/.gitkeep

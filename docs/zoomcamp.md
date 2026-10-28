@@ -7,7 +7,7 @@ Sources: TfL Open Data + Open-Meteo.
 ## What to ship
 
 - **Problem** — who/what/why in [PROJECT.md](../PROJECT.md) §1 and the README.
-- **Cloud** — Terraform + free VM (`zoomcamp/terraform/`) — [cloud-and-free-demo.md](./cloud-and-free-demo.md).
+- **Cloud** — Terraform + one Azure VM from a $100 credit (`zoomcamp/terraform/`) — [cloud-and-free-demo.md](./cloud-and-free-demo.md). Lake stays MinIO.
 - **Ingestion** — one working **batch or stream** path plus a README explainer. Stream: Redpanda + PyFlink. Batch: Airflow + **dlt** → MinIO/MD. Both in-repo is fine; graders need one path that runs.
 - **Warehouse** — MotherDuck + **written** partition/cluster explanation next to models ([data-model.md](./data-model.md)).
 - **Transforms** — dbt (+ PySpark for heavy lake jobs).
@@ -28,5 +28,5 @@ Zoomcamp does **not** require Airflow + Spark + Flink + Redpanda + MinIO + Mothe
 
 ## Cloud vs demo URL
 
-- **Phase 1 Zoomcamp cloud:** Terraform + free VM (lean Compose). See [phases.md](./phases.md).
+- **Phase 1 Zoomcamp cloud:** Terraform + Azure credit VM (lean Compose). Deallocate when idle. See [phases.md](./phases.md).
 - Recruiter/peer **clickable dashboard** ≈ Streamlit Community Cloud + MotherDuck (heavy jobs can stay local).

@@ -1,6 +1,6 @@
 # Implementation status
 
-**As of:** 2026-10-27
+**As of:** 2026-10-28
 
 This repo is **spec-first**. Do not assume Compose, dbt, Airflow, FastAPI, or Next.js exist until they are listed as shipped below.
 
@@ -15,27 +15,29 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 | Living wiki | This `docs/` folder including [phases.md](./phases.md) |
 | Agent context | `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.cursor/skills/` |
 | ADR | [0001-extras-nextjs-fastapi.md](./decisions/0001-extras-nextjs-fastapi.md) — Next.js on FastAPI |
-| Local lake (MinIO) | `zoomcamp/docker-compose.yml` (MinIO only), `zoomcamp/.env.example`, `zoomcamp/lake/upload_bronze.py` → `transitpulse` bronze prefixes |
+| Local lake (MinIO) | `zoomcamp/docker-compose.yml` (MinIO + Airflow), `zoomcamp/.env.example`, `zoomcamp/lake/upload_bronze.py` → `transitpulse` bronze prefixes |
+| Orchestration (local) | `zoomcamp/dags/tube_status.py` — dlt bronze load → dbt `line_status_snapshot` (Compose Airflow on `:8080`, `MINIO_ENDPOINT=http://minio:9000` in container) |
 | Python env | `zoomcamp/pyproject.toml` + `uv.lock` (uv) |
 | Batch ingest (DuckDB) | `zoomcamp/ingest/tfl_line_status_dlt.py`, `weather_hourly_dlt.py`, `fetch_raw.py` |
 | Warehouse (local) | DuckDB `zoomcamp/data/transitpulse.duckdb`, dbt project `zoomcamp/transitPule_dbt/` |
 | Dashboard (graded) | `zoomcamp/dashboard/` Streamlit (reads local `marts.*`) |
 | Sample | `zoomcamp/sample_data/` |
+| CI | `.github/workflows/ci.yml` — `uv sync` + `pytest` in `zoomcamp/` on push |
+| Cloud IaC (Phase 1) | `zoomcamp/terraform/` applied in **austriaeast** zone 1: Ubuntu VM `transitpulse-zoomcamp` (`Standard_B2s_v2`), VNet, public IP, NSG on subnet `transitpulse-public` (SSH :22 from the operator CIDR only). `terraform plan` matches. Docker is not on the VM yet. |
 
 ## Target (not built yet)
 
 | Area | Target |
 |------|--------|
-| Local stack (full) | `Makefile`, Airflow + Redpanda + Flink in Compose |
-| Batch ingest (orchestrated) | `zoomcamp/` Airflow DAGs wrapping **dlt** → MinIO / MotherDuck |
+| Local stack (full) | `Makefile`, Redpanda + Flink in Compose |
+| Batch ingest (orchestrated) | Additional Airflow DAGs (weather, MotherDuck load, full batch chain) |
 | Stream | `zoomcamp/` producers → Redpanda → PyFlink |
 | Lake (silver + orchestration) | Airflow-driven bronze/silver on MinIO beyond manual upload |
 | Warehouse (cloud) | MotherDuck `transitpulse` (local DuckDB slice exists) |
-| Cloud (Phase 1) | `zoomcamp/terraform/` → Oracle Always Free VM + lean graded Compose |
+| Cloud (Phase 1) | Lean graded Compose on the applied Azure VM (Airflow + dlt + MinIO + Streamlit). Deallocate the VM when idle. |
 | API (extras) | `extras/api/` FastAPI `/health` + `/metrics/*` + `/ops/freshness` |
 | UI (extras) | `extras/nextjs/` — browser → FastAPI only |
 | ML (extras) | `extras/ml/` — Phase 2+ |
-| CI | `.github/workflows/ci.yml` |
 | StopPoint subset | Curated stop list for arrivals stream / API snapshots |
 
 ## Phase tracker
@@ -53,6 +55,6 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 
 - **Canonical gold** for Streamlit, FastAPI, and (via API) Next.js = MotherDuck dbt marts, not MinIO “gold files.”
 - Prefer one thin working slice in **`zoomcamp/`** over standing up every container.
-- `cd zoomcamp && docker compose up -d` starts **MinIO only** today. Do not add FastAPI or Next.js to that Compose file.
-- Phase 1 Terraform: laptop slice **before** `terraform apply`. Lean VM only — see [cloud-and-free-demo.md](./cloud-and-free-demo.md).
+- `cd zoomcamp && docker compose up -d --wait` starts **MinIO + Airflow** (UI `:8080`; Compose healthcheck on `/health`, entrypoint clears stale webserver PIDs on the `airflow_data` volume). Upload bronze from the **host** (`uv run python lake/upload_bronze.py` uses `localhost:9000`). DAG tasks use `http://minio:9000`. Do not add FastAPI or Next.js to that Compose file.
+- Phase 1 compute is one Azure VM from a **$100 credit** ([ADR 0002](./decisions/0002-azure-credit-vm.md)). Laptop slice **before** `terraform apply`. Lake stays MinIO — do not add Azure Blob. Deallocate the VM when idle. See [cloud-and-free-demo.md](./cloud-and-free-demo.md).
 - Next.js must not embed `MOTHERDUCK_TOKEN`.

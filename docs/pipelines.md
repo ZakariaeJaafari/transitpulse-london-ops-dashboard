@@ -36,7 +36,16 @@ s3://transitpulse/silver/<entity>/
 | **Silver** | Typed Parquet, conformed `line_id`, `stop_id`, `obs_ts` |
 | **Gold** | dbt marts in **MotherDuck** (canonical). Optional gold files on MinIO are not the API source. |
 
-## As-built scripts (local DuckDB, no Airflow)
+## As-built orchestration (Compose Airflow)
+
+DAG `tube_status` (`zoomcamp/dags/tube_status.py`):
+
+1. `load_tube_bronze` — `uv run python ingest/tfl_line_status_dlt.py` (reads MinIO bronze; in Compose `MINIO_ENDPOINT=http://minio:9000`).
+2. `build_line_status_mart` — `uv run dbt run --profiles-dir . --select line_status_snapshot` in `transitPule_dbt`.
+
+Prerequisite: host `uv run python lake/upload_bronze.py` after MinIO is up (host endpoint `http://localhost:9000`).
+
+## As-built scripts (local DuckDB)
 
 | Script | Source | Destination |
 |--------|--------|-------------|

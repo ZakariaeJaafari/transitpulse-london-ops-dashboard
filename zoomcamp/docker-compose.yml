@@ -12,5 +12,37 @@ services:
     volumes:
       - minio_data:/data
 
+  airflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    restart: unless-stopped
+    depends_on:
+      - minio
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "--connect-timeout", "5", "http://127.0.0.1:8080/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 12
+      start_period: 180s
+    env_file:
+      - .env
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__DAGS_FOLDER: /opt/transitpulse/zoomcamp/dags
+      # Standalone uses SQLite; LocalExecutor requires Postgres (see Airflow executor docs).
+      AIRFLOW__CORE__EXECUTOR: SequentialExecutor
+      # Inside Compose, MinIO is the minio service — not localhost on this container.
+      MINIO_ENDPOINT: http://minio:9000
+      UV_PROJECT_ENVIRONMENT: /home/airflow/.venvs/zoomcamp
+      _AIRFLOW_WWW_USER_USERNAME: ${AIRFLOW_WWW_USER:-admin}
+      _AIRFLOW_WWW_USER_PASSWORD: ${AIRFLOW_WWW_USER_PASSWORD:-admin}
+    volumes:
+      - .:/opt/transitpulse/zoomcamp
+      - airflow_data:/opt/airflow
+
 volumes:
   minio_data:
+  airflow_data:

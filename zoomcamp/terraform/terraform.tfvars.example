@@ -1,0 +1,13 @@
+# Copy to terraform.tfvars (gitignored). Fill real values locally only — never commit.
+
+subscription_id = "00000000-0000-0000-0000-000000000000"
+location        = "uksouth"
+
+# Your current public IPv4 with /32 — https://ifconfig.me or similar
+ssh_allowed_cidr = "203.0.113.10/32"
+
+# Same key you use to SSH (public half), one line
+ssh_public_key = "ssh-ed25519 AAAA... you@host"
+
+# Optional. Standard_B2s is 4 GiB. Standard_B2ms is 8 GiB and spends the credit faster.
+# vm_size = "Standard_B2s"

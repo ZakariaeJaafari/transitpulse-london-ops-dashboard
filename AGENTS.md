@@ -46,7 +46,7 @@ Canonical table: [docs/phases.md](./docs/phases.md).
 | Dashboard | **Streamlit** in `zoomcamp/dashboard/` (graded 2 tiles; reads marts, not extras API) |
 | Product UI | **Next.js** in `extras/nextjs/` → **FastAPI** in `extras/api/` only |
 | Packaging | **uv** (not pip/venv as the default) |
-| IaC | Terraform in `zoomcamp/terraform/` → Oracle Always Free VM (**Phase 1**) |
+| IaC | Terraform in `zoomcamp/terraform/` → Azure VM paid from a $100 credit (**Phase 1**). Lake stays MinIO. |
 
 **Canonical gold** for dashboard and API = MotherDuck **dbt marts**. MinIO gold files are optional, not the serving source.
 

@@ -20,6 +20,7 @@ Template (new file `NNNN-short-title.md`):
 | ID | Title | Status |
 |----|-------|--------|
 | [0001](./0001-extras-nextjs-fastapi.md) | Next.js product UI on FastAPI backend | accepted |
+| [0002](./0002-azure-credit-vm.md) | Azure credit VM instead of Oracle Always Free | accepted |
 
 Expected later ADRs:
 

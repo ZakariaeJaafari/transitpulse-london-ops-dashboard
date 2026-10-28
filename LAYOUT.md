@@ -27,7 +27,7 @@ transitpulse/
     dbt/                    # warehouse transforms + tests
     dashboard/              # Streamlit or Metabase notes — 2 tiles
     sample_data/
-    terraform/              # Phase 1: Oracle Always Free VM
+    terraform/              # Phase 1: Azure credit VM ($100)
 
   extras/                   # ★ PORTFOLIO ONLY — say so in README
     README.md               # “Not required for Zoomcamp grading”

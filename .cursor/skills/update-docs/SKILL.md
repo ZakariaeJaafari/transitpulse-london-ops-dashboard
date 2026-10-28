@@ -25,7 +25,7 @@ In the **same change** as the implementation:
 | Schemas, dbt, marts, delay proxy, StopPoints | `docs/data-model.md` |
 | FastAPI, Next.js, dashboard tiles, who reads gold | `docs/serving.md`, `docs/phases.md` |
 | Phase order | `docs/phases.md` |
-| Terraform, Oracle, Streamlit Cloud | `docs/cloud-and-free-demo.md` |
+| Terraform, Azure VM, Streamlit Cloud | `docs/cloud-and-free-demo.md` |
 | Course / submit | `docs/zoomcamp.md` |
 | End-to-end flow | `docs/diagrams.md` |
 | Folder split | `LAYOUT.md` |

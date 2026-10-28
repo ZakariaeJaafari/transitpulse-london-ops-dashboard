@@ -72,7 +72,7 @@ Note: dlt = ingest/load tool; dbt = transform in the warehouse (different tools)
 | ML tracking | **MLflow** (Phase 2+) | **`extras/ml/`** — experiments + model registry |
 | CI/CD | **GitHub Actions** | Lint, tests, `zoomcamp` compose/DAG/dbt checks on every PR |
 | Python packaging | **uv** | Fast, modern envs |
-| IaC (Phase 1) | Terraform | `zoomcamp/terraform/` Oracle Always Free VM |
+| IaC (Phase 1) | Terraform | `zoomcamp/terraform/` Azure VM ($100 credit). Lake stays MinIO. |
 
 **Medallion:** bronze (raw) → silver (cleaned) → gold (dbt marts).
 
@@ -208,7 +208,7 @@ transitpulse/
     dbt/
     dashboard/              # 2 tiles
     sample_data/
-    terraform/              # Phase 1: Oracle Always Free VM
+    terraform/              # Phase 1: Azure credit VM ($100)
   extras/                   # ★ portfolio only (say so to peers)
     README.md
     api/                    # FastAPI backend for nextjs/
@@ -221,7 +221,7 @@ transitpulse/
 
 ## Cloud & free public demo
 
-Step-by-step guide (Oracle Always Free VM + Terraform, and GitHub + Streamlit Community Cloud + MotherDuck for a live dashboard URL):
+Step-by-step guide (Azure credit VM + Terraform, and GitHub + Streamlit Community Cloud + MotherDuck for a live dashboard URL):
 
 → **[docs/cloud-and-free-demo.md](./docs/cloud-and-free-demo.md)**
 
@@ -229,7 +229,7 @@ Step-by-step guide (Oracle Always Free VM + Terraform, and GitHub + Streamlit Co
 
 ## Cloud note (Phase 1)
 
-Phase 1 ships **cloud + IaC**: Terraform in `zoomcamp/terraform/` → Oracle Always Free VM, lean `zoomcamp/` Compose, MotherDuck as warehouse. Laptop slice first. Details: [docs/cloud-and-free-demo.md](./docs/cloud-and-free-demo.md).
+Phase 1 ships **cloud + IaC**: Terraform in `zoomcamp/terraform/` → one Azure VM paid from a $100 credit, lean `zoomcamp/` Compose, MotherDuck as warehouse. Lake stays MinIO. Laptop slice first. Details: [docs/cloud-and-free-demo.md](./docs/cloud-and-free-demo.md).
 
 ---
 
@@ -243,7 +243,7 @@ Full order: **[docs/phases.md](./docs/phases.md)**.
 - In **`zoomcamp/`**: Airflow + **dlt** + PySpark + Redpanda + PyFlink → MinIO → MotherDuck + dbt
 - Streamlit: **2 tiles** (categorical + temporal) reading gold marts **directly**
 - **GitHub Actions CI** on every push/PR for the graded path (see below)
-- **Terraform** in `zoomcamp/terraform/` → Oracle Always Free VM, **lean** graded Compose. Get the laptop slice working first.
+- **Terraform** in `zoomcamp/terraform/` → Azure credit VM, **lean** graded Compose. Get the laptop slice working first. Deallocate the VM when idle.
 
 ### Phase 1 extras — FastAPI then Next.js (not required for the course project)
 - `extras/api/` FastAPI metrics against gold marts
