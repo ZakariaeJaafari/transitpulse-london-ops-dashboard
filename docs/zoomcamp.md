@@ -7,7 +7,7 @@ Sources: TfL Open Data + Open-Meteo.
 ## What to ship
 
 - **Problem** — who/what/why in [PROJECT.md](../PROJECT.md) §1 and the README.
-- **Cloud** — Terraform + one Azure VM from a $100 credit (`zoomcamp/terraform/`) — [cloud-and-free-demo.md](./cloud-and-free-demo.md). Lake stays MinIO.
+- **Cloud** — Terraform + one Azure VM from a $100 credit (`zoomcamp/terraform/`) — [cloud-and-free-demo.md](./cloud-and-free-demo.md). What has already run on that VM: [azure-vm-move.md](./azure-vm-move.md). Lake stays MinIO.
 - **Ingestion** — one working **batch or stream** path plus a README explainer. Stream: Redpanda + PyFlink. Batch: Airflow + **dlt** → MinIO/MD. Both in-repo is fine; graders need one path that runs.
 - **Warehouse** — MotherDuck + **written** partition/cluster explanation next to models ([data-model.md](./data-model.md)).
 - **Transforms** — dbt (+ PySpark for heavy lake jobs).

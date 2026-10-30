@@ -19,11 +19,13 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 | Orchestration (local) | `zoomcamp/dags/tube_status.py` — dlt bronze load → dbt `line_status_snapshot` (Compose Airflow on `:8080`, `MINIO_ENDPOINT=http://minio:9000` in container) |
 | Python env | `zoomcamp/pyproject.toml` + `uv.lock` (uv) |
 | Batch ingest (DuckDB) | `zoomcamp/ingest/tfl_line_status_dlt.py`, `weather_hourly_dlt.py`, `fetch_raw.py` |
-| Warehouse (local) | DuckDB `zoomcamp/data/transitpulse.duckdb`, dbt project `zoomcamp/transitPule_dbt/` |
-| Dashboard (graded) | `zoomcamp/dashboard/` Streamlit (reads local `marts.*`) |
+| Warehouse (local) | DuckDB `zoomcamp/data/transitpulse.duckdb` (`bronze.*`), dbt project `zoomcamp/transitPule_dbt/` (dev → local `marts.*` views) |
+| Warehouse (MotherDuck) | `transitpulse` database: dbt `motherduck` target → `marts.line_status_snapshot`, `marts.weather_hourly` tables (bronze via attached local lake) |
+| Dashboard (graded) | `zoomcamp/dashboard/` Streamlit (reads MotherDuck `marts.line_status_snapshot`, `marts.weather_hourly`) |
 | Sample | `zoomcamp/sample_data/` |
 | CI | `.github/workflows/ci.yml` — `uv sync` + `pytest` in `zoomcamp/` on push |
-| Cloud IaC (Phase 1) | `zoomcamp/terraform/` applied in **austriaeast** zone 1: Ubuntu VM `transitpulse-zoomcamp` (`Standard_B2s_v2`), VNet, public IP, NSG on subnet `transitpulse-public` (SSH :22 from the operator CIDR only). `terraform plan` matches. Docker is not on the VM yet. |
+| Cloud IaC (Phase 1) | `zoomcamp/terraform/` applied in **austriaeast** zone 1: Ubuntu VM `transitpulse-zoomcamp` (`Standard_B2s_v2`), VNet, public IP, NSG on subnet `transitpulse-public` (SSH :22 from the operator CIDR only). Log: [azure-vm-move.md](./azure-vm-move.md). |
+| Cloud Compose (Phase 1) | On that VM, MinIO and Airflow came up healthy, then DAG `tube_status` run `manual__2026-10-28T20:41:27` succeeded (2026-10-28). UIs from the laptop use SSH tunnels: Airflow `localhost:8081`, MinIO console `localhost:19001`. Log: [azure-vm-move.md](./azure-vm-move.md). VM deallocated after that session. |
 
 ## Target (not built yet)
 
@@ -33,8 +35,8 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 | Batch ingest (orchestrated) | Additional Airflow DAGs (weather, MotherDuck load, full batch chain) |
 | Stream | `zoomcamp/` producers → Redpanda → PyFlink |
 | Lake (silver + orchestration) | Airflow-driven bronze/silver on MinIO beyond manual upload |
-| Warehouse (cloud) | MotherDuck `transitpulse` (local DuckDB slice exists) |
-| Cloud (Phase 1) | Lean graded Compose on the applied Azure VM (Airflow + dlt + MinIO + Streamlit). Deallocate the VM when idle. |
+| Warehouse (cloud) | MotherDuck load orchestrated from Airflow/VM without laptop attach |
+| Cloud (Phase 1) | Streamlit on the VM. Deallocate the VM whenever it is not in use. |
 | API (extras) | `extras/api/` FastAPI `/health` + `/metrics/*` + `/ops/freshness` |
 | UI (extras) | `extras/nextjs/` — browser → FastAPI only |
 | ML (extras) | `extras/ml/` — Phase 2+ |
@@ -45,7 +47,7 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 | Phase | Intent | Status |
 |-------|--------|--------|
 | 0 | Spec, LAYOUT, docs, agent context | Shipped |
-| 1 Zoomcamp | Vertical slice in `zoomcamp/` + Terraform free VM (`zoomcamp/terraform/`) | In progress (MinIO bronze upload + local dbt/dashboard) |
+| 1 Zoomcamp | Vertical slice in `zoomcamp/` + Terraform free VM (`zoomcamp/terraform/`) | In progress (local slice done; VM Compose and `tube_status` succeeded; VM deallocated) |
 | 1 extras API | FastAPI metrics in `extras/api/` on gold marts | Not started |
 | 1 extras UI | Next.js in `extras/nextjs/` calling FastAPI only | Not started |
 | 2 | Feature marts, XGBoost, MLflow, batch scores (`extras/ml/`) | Not started |

@@ -1,0 +1,24 @@
+---
+description: Keep the Zoomcamp Azure VM move log current as work leaves the laptop
+alwaysApply: true
+---
+
+# Azure VM move log
+
+`docs/azure-vm-move.md` is the certification log of the laptop → Azure VM move.
+
+In the **same change** as any Terraform, VM, or on-VM stack step:
+
+1. Update `docs/azure-vm-move.md` with the date, the command that ran, and the result.
+2. Update `docs/status.md` so shipped and target match that log.
+3. Record only steps that succeeded. Leave the next step under **Not done yet**.
+4. Do not write secrets: no `.env` values, subscription id, SSH private key, or operator IP.
+
+```markdown
+# ❌ BAD
+DAG tube_status is done on the VM.   # container is only healthy
+
+# ✅ GOOD
+## Not done yet
+- Run DAG tube_status on the VM and record a green run.
+```

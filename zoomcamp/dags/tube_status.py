@@ -36,7 +36,9 @@ with DAG(
         task_id="build_line_status_mart",
         bash_command=(
             f"cd {ZOOMCAMP_ROOT}/transitPule_dbt && "
-            "uv run dbt run --profiles-dir . --select line_status_snapshot --no-partial-parse"
+            'export motherduck_token="$MOTHERDUCK_TOKEN" && '
+            "uv run dbt run --profiles-dir . --target motherduck "
+            "--select line_status_snapshot --no-partial-parse"
         ),
     )
 

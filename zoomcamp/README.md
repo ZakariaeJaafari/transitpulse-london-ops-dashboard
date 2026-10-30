@@ -40,10 +40,11 @@ cd transitPule_dbt
 uv run dbt run --profiles-dir . --select line_status_snapshot weather_hourly
 uv run dbt test --profiles-dir . --select line_status_snapshot weather_hourly
 cd ..
+set -a && source .env && set +a && export motherduck_token="$MOTHERDUCK_TOKEN"
 uv run streamlit run dashboard/app.py
 ```
 
-Warehouse: `data/transitpulse.duckdb` (`bronze.*`, `marts.*` views). Dashboard reads `marts.*` read-only.
+Warehouse: local `data/transitpulse.duckdb` holds `bronze.*`; dbt **dev** builds `marts.*` views there. **MotherDuck** (`md:transitpulse`, `MOTHERDUCK_TOKEN` / `motherduck_token`) holds gold `marts.line_status_snapshot` and `marts.weather_hourly` tables. The Streamlit dashboard reads **MotherDuck marts only** (export the token before `streamlit run`).
 
 Tests (no `.env` required):
 
@@ -77,7 +78,7 @@ terraform validate
 
 Details: [terraform/README.md](terraform/README.md) · [docs/cloud-and-free-demo.md](../docs/cloud-and-free-demo.md).
 
-The VM is applied (`austriaeast`, zone 1, `Standard_B2s_v2`). Lean Compose on that VM is the next step. Deallocate it when idle.
+The VM is applied (`austriaeast`, zone 1, `Standard_B2s_v2`). MinIO, Airflow, and a successful `tube_status` run are recorded in [docs/azure-vm-move.md](../docs/azure-vm-move.md), including the laptop SSH tunnels (Airflow `:8081`, MinIO `:19001`). Deallocate the VM when idle.
 
 Living docs: [docs/zoomcamp.md](../docs/zoomcamp.md) · [docs/cloud-and-free-demo.md](../docs/cloud-and-free-demo.md) · [docs/status.md](../docs/status.md)
 

@@ -1,4 +1,4 @@
-{{ config(materialized='view') }}
+{{ config(materialized='table' if target.name == 'motherduck' else 'view') }}
 
 /*
   Bronze columns (DESCRIBE):

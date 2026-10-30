@@ -1,15 +1,13 @@
-"""TransitPulse Zoomcamp dashboard — read-only queries against local dbt marts."""
+"""TransitPulse Zoomcamp dashboard — read-only queries against MotherDuck dbt marts."""
 
 from __future__ import annotations
-
-from pathlib import Path
 
 import altair as alt
 import duckdb
 import pandas as pd
 import streamlit as st
 
-DB_PATH = Path(__file__).resolve().parent.parent / "data" / "transitpulse.duckdb"
+MOTHERDUCK_DB = "md:transitpulse"
 
 LINE_LABELS: dict[str, str] = {
     "bakerloo": "Bakerloo",
@@ -27,8 +25,8 @@ LINE_LABELS: dict[str, str] = {
 
 
 @st.cache_data(show_spinner="Loading marts…")
-def load_marts(db_path: str) -> tuple[pd.DataFrame, pd.DataFrame]:
-    conn = duckdb.connect(db_path, read_only=True)
+def load_marts() -> tuple[pd.DataFrame, pd.DataFrame]:
+    conn = duckdb.connect(MOTHERDUCK_DB)
     try:
         lines = conn.execute(
             """
@@ -51,6 +49,7 @@ def load_marts(db_path: str) -> tuple[pd.DataFrame, pd.DataFrame]:
         ).df()
     finally:
         conn.close()
+
     return lines, weather
 
 
@@ -73,19 +72,12 @@ def main() -> None:
     st.set_page_config(page_title="TransitPulse", layout="wide")
     st.title("TransitPulse London")
 
-    if not DB_PATH.is_file():
-        st.error(
-            f"Warehouse not found at `{DB_PATH}`. "
-            "Run dlt ingest and `dbt run` in `transitPule_dbt/` first."
-        )
-        st.stop()
-
-    lines_df, weather_df = load_marts(str(DB_PATH))
+    lines_df, weather_df = load_marts()
 
     if lines_df.empty:
-        st.warning("`marts.line_status_snapshot` has no rows.")
+        st.warning("`marts.line_status_snapshot` has no rows on MotherDuck.")
     if weather_df.empty:
-        st.warning("`marts.weather_hourly` has no rows.")
+        st.warning("`marts.weather_hourly` has no rows on MotherDuck.")
 
     status_date = lines_df["status_date"].iloc[0] if not lines_df.empty else None
     snapshot_title = (

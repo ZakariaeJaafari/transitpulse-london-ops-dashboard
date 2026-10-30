@@ -45,7 +45,7 @@ terraform apply
 
 `plan` shows what would be created. `apply` starts billing the credit for the VM, the 30 GiB SSD, and the public IP.
 
-Current apply: `austriaeast` zone 1, size `Standard_B2s_v2` (set in `terraform.tfvars`). The security group is attached to the public subnet. Docker is not on the VM yet.
+Current apply: `austriaeast` zone 1, size `Standard_B2s_v2` (set in `terraform.tfvars`). The security group is attached to the public subnet. Docker, Compose, and a successful `tube_status` run are recorded in [docs/azure-vm-move.md](../../docs/azure-vm-move.md). From the laptop, tunnel Airflow to `localhost:8081` and MinIO to `localhost:19001`.
 
 After apply, note `public_ip` and use `ssh_command` from the outputs. Tunnel Airflow and MinIO:
 

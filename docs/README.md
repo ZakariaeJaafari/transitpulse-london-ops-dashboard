@@ -16,6 +16,7 @@ Agent briefing: [AGENTS.md](../AGENTS.md). Cursor workflows: `.cursor/skills/` (
 | [serving.md](./serving.md) | Streamlit (graded) + FastAPI BE + Next.js FE |
 | [zoomcamp.md](./zoomcamp.md) | Course deliverables |
 | [cloud-and-free-demo.md](./cloud-and-free-demo.md) | Terraform VM + Streamlit public demo |
+| [azure-vm-move.md](./azure-vm-move.md) | Certification log: laptop slice → Azure VM |
 | [decisions/](./decisions/README.md) | ADRs |
 
 Human landing page: [README.md](../README.md). Folder split: [LAYOUT.md](../LAYOUT.md) (`zoomcamp/` graded, `extras/` portfolio).
@@ -41,7 +42,7 @@ In the **same change** as the code or architecture edit:
 | Phase order / what ships when | [phases.md](./phases.md), [status.md](./status.md) |
 | Compose, Makefile, `.env.example`, ports | [zoomcamp/README.md](../zoomcamp/README.md), root [README.md](../README.md) how-to-run, [status.md](./status.md) |
 | Folder split / where code lives | [LAYOUT.md](../LAYOUT.md) |
-| Terraform, Azure VM, Streamlit Cloud | [cloud-and-free-demo.md](./cloud-and-free-demo.md), [status.md](./status.md) |
+| Terraform, Azure VM, on-VM Compose, Streamlit Cloud | [azure-vm-move.md](./azure-vm-move.md), [cloud-and-free-demo.md](./cloud-and-free-demo.md), [status.md](./status.md) |
 | Course deliverables, submit checklist | [zoomcamp.md](./zoomcamp.md) |
 | A durable design choice | New ADR under [decisions/](./decisions/README.md) |
 | End-to-end flow | [diagrams.md](./diagrams.md) |

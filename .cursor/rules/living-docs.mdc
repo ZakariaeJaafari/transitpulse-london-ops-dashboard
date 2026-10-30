@@ -9,6 +9,7 @@ After any change to stack, contracts, run steps, or course deliverables, update 
 
 1. The matching page under `docs/` (see `docs/README.md` table).
 2. `docs/status.md` (as-built vs still-target; never leave “target” on shipped work).
+3. `docs/azure-vm-move.md` when the change touches the Azure VM, Terraform, or the stack running on that VM. Record only steps that succeeded.
 
 Also:
 

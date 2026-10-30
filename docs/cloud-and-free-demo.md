@@ -30,7 +30,7 @@ Decision: [0002-azure-credit-vm.md](./decisions/0002-azure-credit-vm.md).
   - One public IP
   - One Ubuntu 24.04 VM, default size `Standard_B2s` (2 vCPU, 4 GiB)
 
-**As-built (2026-10-28):** applied in `austriaeast` zone 1 as `Standard_B2s_v2` (2 vCPU, 8 GiB). The student subscription blocks `uksouth`, and `Standard_B2s` had no capacity in the allowed regions. `vm_size` and `location` in gitignored `terraform.tfvars` override the code defaults. The NSG is associated with subnet `transitpulse-public`. Docker is not installed on the VM yet.
+**As-built (2026-10-28):** applied in `austriaeast` zone 1 as `Standard_B2s_v2` (2 vCPU, 8 GiB). The student subscription blocks `uksouth`, and `Standard_B2s` had no capacity in the allowed regions. `vm_size` and `location` in gitignored `terraform.tfvars` override the code defaults. The NSG is associated with subnet `transitpulse-public`. Docker 29.1.3 and Compose 2.40.3 are installed. MinIO and Airflow came up healthy, and DAG `tube_status` run `manual__2026-10-28T20:41:27` succeeded. From the laptop, Airflow is `ssh -L 8081:localhost:8080` then http://localhost:8081. MinIO is `ssh -L 19000:localhost:9000 -L 19001:localhost:9001` then http://localhost:19001. Step log: [azure-vm-move.md](./azure-vm-move.md).
 
 **Caveats (honest):**
 
