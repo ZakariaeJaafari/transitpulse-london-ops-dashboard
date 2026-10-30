@@ -29,22 +29,22 @@ uv run python lake/upload_bronze.py   # host → http://localhost:9000
 
 Airflow runs in Docker (not on Windows natively). The repo is mounted at `/opt/transitpulse/zoomcamp`; DAG tasks use `http://minio:9000` for the lake. Keep `MINIO_ENDPOINT=http://localhost:9000` in `.env` for host commands.
 
-DuckDB warehouse path (no MinIO required):
+MotherDuck warehouse path (export token before dlt, dbt, and dashboard):
 
 ```bash
 cd zoomcamp
 uv sync
-uv run python ingest/tfl_line_status_dlt.py
-uv run python ingest/weather_hourly_dlt.py
-cd transitPule_dbt
-uv run dbt run --profiles-dir . --select line_status_snapshot weather_hourly
-uv run dbt test --profiles-dir . --select line_status_snapshot weather_hourly
-cd ..
 set -a && source .env && set +a && export motherduck_token="$MOTHERDUCK_TOKEN"
+uv run python ingest/weather_hourly_dlt.py
+uv run python ingest/tfl_line_status_dlt.py   # MinIO up for lake read
+cd transitPule_dbt
+uv run dbt run --profiles-dir . --target motherduck --select line_status_snapshot weather_hourly --no-partial-parse
+uv run dbt test --profiles-dir . --target motherduck --select line_status_snapshot weather_hourly
+cd ..
 uv run streamlit run dashboard/app.py
 ```
 
-Warehouse: local `data/transitpulse.duckdb` holds `bronze.*`; dbt **dev** builds `marts.*` views there. **MotherDuck** (`md:transitpulse`, `MOTHERDUCK_TOKEN` / `motherduck_token`) holds gold `marts.line_status_snapshot` and `marts.weather_hourly` tables. The Streamlit dashboard reads **MotherDuck marts only** (export the token before `streamlit run`).
+Local file `data/transitpulse.duckdb` is for dbt **dev** only. **dlt** loads bronze into MotherDuck `transitpulse.bronze.*`; dbt **motherduck** builds `marts.line_status_snapshot` and `marts.weather_hourly` in the same database. Streamlit reads **MotherDuck marts only**.
 
 Tests (no `.env` required):
 

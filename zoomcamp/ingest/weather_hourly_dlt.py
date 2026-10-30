@@ -13,7 +13,7 @@ SAMPLE_PATH = (
     / "sample_data"
     / "london_weather_2026-10-27.json"
 )
-DB_PATH = Path(__file__).resolve().parent.parent / "data" / "transitpulse.duckdb"
+MOTHERDUCK_DB = "md:transitpulse"
 
 RESOURCE_NAME = "weather_hourly"
 
@@ -43,8 +43,8 @@ def weather_hourly():
         yield record
 
 
-def _print_post_load_report(db_path: Path) -> None:
-    con = duckdb.connect(str(db_path), read_only=True)
+def _print_post_load_report() -> None:
+    con = duckdb.connect(MOTHERDUCK_DB)
     try:
         row_count = con.execute(
             f"SELECT count(*) FROM bronze.{RESOURCE_NAME}"
@@ -66,12 +66,12 @@ def _print_post_load_report(db_path: Path) -> None:
 def main() -> None:
     pipeline = dlt.pipeline(
         pipeline_name="weather_hourly",
-        destination=dlt.destinations.duckdb(str(DB_PATH.resolve())),
+        destination=dlt.destinations.motherduck(credentials=MOTHERDUCK_DB),
         dataset_name="bronze",
     )
     load_info = pipeline.run(weather_hourly())
     print(load_info)
-    _print_post_load_report(DB_PATH)
+    _print_post_load_report()
 
 
 if __name__ == "__main__":

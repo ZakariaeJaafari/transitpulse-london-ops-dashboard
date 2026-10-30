@@ -11,7 +11,3 @@ transitPule_dbt:
       path: md:transitpulse
       schema: marts
       threads: 1
-      attach:
-        - path: ../data/transitpulse.duckdb
-          alias: local_lake
-          read_only: true

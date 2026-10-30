@@ -29,7 +29,11 @@ with DAG(
 ) as dag:
     load_tube_bronze = BashOperator(
         task_id="load_tube_bronze",
-        bash_command=f"cd {ZOOMCAMP_ROOT} && uv run python ingest/tfl_line_status_dlt.py",
+        bash_command=(
+            f"cd {ZOOMCAMP_ROOT} && "
+            'export motherduck_token="$MOTHERDUCK_TOKEN" && '
+            "uv run python ingest/tfl_line_status_dlt.py"
+        ),
     )
 
     build_line_status_mart = BashOperator(

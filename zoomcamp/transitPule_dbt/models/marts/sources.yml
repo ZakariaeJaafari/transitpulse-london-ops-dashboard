@@ -3,7 +3,6 @@ version: 2
 sources:
   - name: bronze
     schema: bronze
-    database: "{{ 'local_lake' if target.name == 'motherduck' else none }}"
     tables:
       - name: tfl_line_status
       - name: tfl_line_status__line_statuses

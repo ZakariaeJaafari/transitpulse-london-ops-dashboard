@@ -1,6 +1,6 @@
 # Implementation status
 
-**As of:** 2026-10-28
+**As of:** 2026-10-30
 
 This repo is **spec-first**. Do not assume Compose, dbt, Airflow, FastAPI, or Next.js exist until they are listed as shipped below.
 
@@ -18,9 +18,9 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 | Local lake (MinIO) | `zoomcamp/docker-compose.yml` (MinIO + Airflow), `zoomcamp/.env.example`, `zoomcamp/lake/upload_bronze.py` → `transitpulse` bronze prefixes |
 | Orchestration (local) | `zoomcamp/dags/tube_status.py` — dlt bronze load → dbt `line_status_snapshot` (Compose Airflow on `:8080`, `MINIO_ENDPOINT=http://minio:9000` in container) |
 | Python env | `zoomcamp/pyproject.toml` + `uv.lock` (uv) |
-| Batch ingest (DuckDB) | `zoomcamp/ingest/tfl_line_status_dlt.py`, `weather_hourly_dlt.py`, `fetch_raw.py` |
-| Warehouse (local) | DuckDB `zoomcamp/data/transitpulse.duckdb` (`bronze.*`), dbt project `zoomcamp/transitPule_dbt/` (dev → local `marts.*` views) |
-| Warehouse (MotherDuck) | `transitpulse` database: dbt `motherduck` target → `marts.line_status_snapshot`, `marts.weather_hourly` tables (bronze via attached local lake) |
+| Batch ingest (dlt) | `zoomcamp/ingest/tfl_line_status_dlt.py`, `weather_hourly_dlt.py`, `fetch_raw.py` — dlt → MotherDuck `transitpulse.bronze.*` (`motherduck_token` / `MOTHERDUCK_TOKEN`) |
+| Warehouse (local dev) | DuckDB file `zoomcamp/data/transitpulse.duckdb` for dbt **dev** target only (`marts.*` views); not the live bronze path after Lesson 24 |
+| Warehouse (MotherDuck) | `transitpulse`: `bronze.*` from dlt; dbt **motherduck** target → `marts.line_status_snapshot`, `marts.weather_hourly` (same database, no local attach) |
 | Dashboard (graded) | `zoomcamp/dashboard/` Streamlit (reads MotherDuck `marts.line_status_snapshot`, `marts.weather_hourly`) |
 | Sample | `zoomcamp/sample_data/` |
 | CI | `.github/workflows/ci.yml` — `uv sync` + `pytest` in `zoomcamp/` on push |

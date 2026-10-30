@@ -13,7 +13,7 @@ from botocore.client import Config
 from dotenv import load_dotenv
 
 ZOOMCAMP_ROOT = Path(__file__).resolve().parent.parent
-DB_PATH = ZOOMCAMP_ROOT / "data" / "transitpulse.duckdb"
+MOTHERDUCK_DB = "md:transitpulse"
 
 BUCKET = "transitpulse"
 BRONZE_OBJECT_KEY = "bronze/tfl_line_status/2026/10/27/tube_line.json"
@@ -55,8 +55,8 @@ def tfl_line_status():
         yield record
 
 
-def _print_post_load_report(db_path: Path) -> None:
-    con = duckdb.connect(str(db_path), read_only=True)
+def _print_post_load_report() -> None:
+    con = duckdb.connect(MOTHERDUCK_DB)
     try:
         tables = con.execute(
             """
@@ -92,12 +92,12 @@ def _print_post_load_report(db_path: Path) -> None:
 def main() -> None:
     pipeline = dlt.pipeline(
         pipeline_name="tfl_line_status",
-        destination=dlt.destinations.duckdb(str(DB_PATH.resolve())),
+        destination=dlt.destinations.motherduck(credentials=MOTHERDUCK_DB),
         dataset_name="bronze",
     )
     load_info = pipeline.run(tfl_line_status())
     print(load_info)
-    _print_post_load_report(DB_PATH)
+    _print_post_load_report()
 
 
 if __name__ == "__main__":

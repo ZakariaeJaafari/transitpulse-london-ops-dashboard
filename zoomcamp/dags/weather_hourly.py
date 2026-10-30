@@ -29,7 +29,11 @@ with DAG(
 ) as dag:
     load_weather_bronze = BashOperator(
         task_id="load_weather_bronze",
-        bash_command=f"cd {ZOOMCAMP_ROOT} && uv run python ingest/weather_hourly_dlt.py",
+        bash_command=(
+            f"cd {ZOOMCAMP_ROOT} && "
+            'export motherduck_token="$MOTHERDUCK_TOKEN" && '
+            "uv run python ingest/weather_hourly_dlt.py"
+        ),
     )
 
     build_weather_mart = BashOperator(
