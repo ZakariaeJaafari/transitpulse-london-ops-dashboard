@@ -16,7 +16,7 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 | Agent context | `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.cursor/skills/` |
 | ADR | [0001-extras-nextjs-fastapi.md](./decisions/0001-extras-nextjs-fastapi.md) — Next.js on FastAPI |
 | Local lake (MinIO) | `zoomcamp/docker-compose.yml` (MinIO + Airflow), `zoomcamp/.env.example`, `zoomcamp/lake/upload_bronze.py` → `transitpulse` bronze prefixes |
-| Orchestration (local) | `zoomcamp/dags/tube_status.py` — dlt bronze load → dbt `line_status_snapshot` (Compose Airflow on `:8080`, `MINIO_ENDPOINT=http://minio:9000` in container) |
+| Orchestration (local) | `zoomcamp/dags/tube_status.py` and `zoomcamp/dags/weather_hourly.py` — dlt into MotherDuck `transitpulse.bronze` → dbt `--target motherduck` (Compose Airflow on `:8080`, `MINIO_ENDPOINT=http://minio:9000` in the container) |
 | Python env | `zoomcamp/pyproject.toml` + `uv.lock` (uv) |
 | Batch ingest (dlt) | `zoomcamp/ingest/tfl_line_status_dlt.py`, `weather_hourly_dlt.py`, `fetch_raw.py` — dlt → MotherDuck `transitpulse.bronze.*` (`motherduck_token` / `MOTHERDUCK_TOKEN`) |
 | Warehouse (local dev) | DuckDB file `zoomcamp/data/transitpulse.duckdb` for dbt **dev** target only (`marts.*` views); not the live bronze path after Lesson 24 |
@@ -25,17 +25,16 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 | Sample | `zoomcamp/sample_data/` |
 | CI | `.github/workflows/ci.yml` — `uv sync` + `pytest` in `zoomcamp/` on push |
 | Cloud IaC (Phase 1) | `zoomcamp/terraform/` applied in **austriaeast** zone 1: Ubuntu VM `transitpulse-zoomcamp` (`Standard_B2s_v2`), VNet, public IP, NSG on subnet `transitpulse-public` (SSH :22 from the operator CIDR only). Log: [azure-vm-move.md](./azure-vm-move.md). |
-| Cloud Compose (Phase 1) | On that VM, MinIO and Airflow came up healthy, then DAG `tube_status` run `manual__2026-10-28T20:41:27` succeeded (2026-10-28). UIs from the laptop use SSH tunnels: Airflow `localhost:8081`, MinIO console `localhost:19001`. Log: [azure-vm-move.md](./azure-vm-move.md). VM deallocated after that session. |
+| Cloud Compose (Phase 1) | On that VM, MinIO and Airflow are healthy. `tube_status` run `manual__2026-10-30T19:09:45+00:00` and `weather_hourly` run `manual__2026-10-30T19:09:48+00:00` succeeded (2026-10-30): MotherDuck `transitpulse.bronze` and the two marts. UIs from the laptop use SSH tunnels: Airflow `localhost:8081`, MinIO console `localhost:19001`. Log: [azure-vm-move.md](./azure-vm-move.md). VM deallocated after that session. |
 
 ## Target (not built yet)
 
 | Area | Target |
 |------|--------|
 | Local stack (full) | `Makefile`, Redpanda + Flink in Compose |
-| Batch ingest (orchestrated) | Additional Airflow DAGs (weather, MotherDuck load, full batch chain) |
+| Batch ingest (orchestrated) | One DAG chain that runs Tube and weather together |
 | Stream | `zoomcamp/` producers → Redpanda → PyFlink |
 | Lake (silver + orchestration) | Airflow-driven bronze/silver on MinIO beyond manual upload |
-| Warehouse (cloud) | MotherDuck load orchestrated from Airflow/VM without laptop attach |
 | Cloud (Phase 1) | Streamlit on the VM. Deallocate the VM whenever it is not in use. |
 | API (extras) | `extras/api/` FastAPI `/health` + `/metrics/*` + `/ops/freshness` |
 | UI (extras) | `extras/nextjs/` — browser → FastAPI only |
@@ -47,7 +46,7 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 | Phase | Intent | Status |
 |-------|--------|--------|
 | 0 | Spec, LAYOUT, docs, agent context | Shipped |
-| 1 Zoomcamp | Vertical slice in `zoomcamp/` + Terraform free VM (`zoomcamp/terraform/`) | In progress (local slice done; VM Compose and `tube_status` succeeded; VM deallocated) |
+| 1 Zoomcamp | Vertical slice in `zoomcamp/` + Terraform free VM (`zoomcamp/terraform/`) | In progress (local slice done; VM Airflow loaded MotherDuck and both DAGs succeeded 2026-10-30; VM deallocated; Streamlit on the VM still open) |
 | 1 extras API | FastAPI metrics in `extras/api/` on gold marts | Not started |
 | 1 extras UI | Next.js in `extras/nextjs/` calling FastAPI only | Not started |
 | 2 | Feature marts, XGBoost, MLflow, batch scores (`extras/ml/`) | Not started |

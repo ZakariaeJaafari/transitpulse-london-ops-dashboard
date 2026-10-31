@@ -2,7 +2,7 @@
 
 Certification log for the Phase 1 cloud step: the graded `zoomcamp/` slice ran on a laptop first, then the same Compose stack was started on one Azure VM. This page records **what has actually run**. The how-to for a fresh apply is [cloud-and-free-demo.md](./cloud-and-free-demo.md). Decision: [0002-azure-credit-vm.md](./decisions/0002-azure-credit-vm.md).
 
-**As of:** 2026-10-28.
+**As of:** 2026-10-30.
 
 Data on this project is **Data provided by Transport for London** / Powered by TfL Open Data, plus Open-Meteo. This is not an official TfL product.
 
@@ -10,7 +10,7 @@ Data on this project is **Data provided by Transport for London** / Powered by T
 
 - Cloud compute is an **Azure VM** created with **Terraform** in `zoomcamp/terraform/`, paid from a **$100 Azure for Students credit**.
 - The lake stays **MinIO** on that VM. No Azure Blob, Azure SQL, or other Azure data service.
-- The warehouse file on the laptop is still local DuckDB. **MotherDuck is not wired yet.**
+- The warehouse is **MotherDuck** database `transitpulse`. dlt loads `bronze`, and dbt `--target motherduck` builds `marts.line_status_snapshot` and `marts.weather_hourly`. The laptop DuckDB file is the dbt `dev` target only.
 
 ## Done on the laptop before the VM
 
@@ -110,10 +110,23 @@ docker compose exec airflow airflow dags trigger tube_status
 5. Run `manual__2026-10-28T20:41:27` is **success** (start 20:41:28 UTC, end 20:41:43 UTC). That run is the load and `line_status_snapshot` on the VM's DuckDB file.
 6. After that session, `az vm deallocate --resource-group transitpulse-rg --name transitpulse-zoomcamp` completed. Start the same VM again with `az vm start` before the next SSH or tunnel.
 
+## Done — MotherDuck DAGs on the VM
+
+2026-10-30. `az vm start` reached `VM running`. The SSH rule in gitignored `terraform.tfvars` was updated so the current home address could connect. That address is not recorded here.
+
+1. The laptop `.env` was copied again with `scp`. It is gitignored.
+2. `transitPule_dbt` was owned by uid `50000`, so `git pull` could not replace tracked files. `sudo chown -R ubuntu:ubuntu .` on the clone, then `git reset --hard origin/FirstUpload`. `HEAD` is `4a3fc50` (`Load bronze to motherduck and adapt pipelines to that localy`).
+3. `mkdir -p data transitPule_dbt/target transitPule_dbt/logs`, then `sudo chown -R 50000:0 data transitPule_dbt` so the Airflow user can write the dbt log.
+4. `docker compose up -d --build --wait`: `zoomcamp-minio-1` and `zoomcamp-airflow-1` healthy.
+5. `airflow dags unpause weather_hourly`, then trigger both DAGs.
+6. `tube_status` run `manual__2026-10-30T19:09:45+00:00` is **success** (start 19:09:47 UTC, end 19:10:17 UTC).
+7. `weather_hourly` run `manual__2026-10-30T19:09:48+00:00` is **success** (start 19:09:59 UTC, end 19:10:27 UTC).
+
+Those runs load `transitpulse.bronze` and build the two marts with `dbt run --target motherduck`. After the session, `az vm deallocate --resource-group transitpulse-rg --name transitpulse-zoomcamp` returned to the shell prompt with no error.
+
 ## Not done yet
 
-- Point dbt at MotherDuck. The VM warehouse file is still local DuckDB on the VM disk.
-- Run Streamlit on the VM. The graded dashboard still runs on the laptop.
+- Run Streamlit on the VM. The graded dashboard still runs on the laptop and reads MotherDuck.
 
 ## Secrets that stay off GitHub
 

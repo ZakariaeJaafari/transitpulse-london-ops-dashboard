@@ -40,18 +40,23 @@ s3://transitpulse/silver/<entity>/
 
 DAG `tube_status` (`zoomcamp/dags/tube_status.py`):
 
-1. `load_tube_bronze` — `uv run python ingest/tfl_line_status_dlt.py` (reads MinIO bronze; in Compose `MINIO_ENDPOINT=http://minio:9000`).
-2. `build_line_status_mart` — `uv run dbt run --profiles-dir . --select line_status_snapshot` in `transitPule_dbt`.
+1. `load_tube_bronze` — `uv run python ingest/tfl_line_status_dlt.py` (reads MinIO bronze; in Compose `MINIO_ENDPOINT=http://minio:9000`; dlt writes MotherDuck `transitpulse.bronze`).
+2. `build_line_status_mart` — `uv run dbt run --profiles-dir . --target motherduck --select line_status_snapshot` in `transitPule_dbt`.
 
-Prerequisite: host `uv run python lake/upload_bronze.py` after MinIO is up (host endpoint `http://localhost:9000`).
+DAG `weather_hourly` (`zoomcamp/dags/weather_hourly.py`):
 
-## As-built scripts (local DuckDB)
+1. `load_weather_bronze` — `uv run python ingest/weather_hourly_dlt.py` (sample JSON in the repo; dlt writes MotherDuck `transitpulse.bronze`).
+2. `build_weather_mart` — `uv run dbt run --profiles-dir . --target motherduck --select weather_hourly`.
+
+Both tasks export `motherduck_token` from `MOTHERDUCK_TOKEN`. Prerequisite for the Tube DAG: host `uv run python lake/upload_bronze.py` after MinIO is up (host endpoint `http://localhost:9000`).
+
+## As-built scripts
 
 | Script | Source | Destination |
 |--------|--------|-------------|
 | `zoomcamp/lake/upload_bronze.py` | `sample_data/tube_line.json`, `sample_data/london_weather.json` | MinIO `s3://transitpulse/bronze/.../2026/10/27/` (raw bytes) |
-| `zoomcamp/ingest/tfl_line_status_dlt.py` | `sample_data/tube_line_2026-10-27.json` | `bronze.tfl_line_status` (+ nested dlt tables) |
-| `zoomcamp/ingest/weather_hourly_dlt.py` | `sample_data/london_weather_2026-10-27.json` | `bronze.weather_hourly` (one row per hourly array index) |
+| `zoomcamp/ingest/tfl_line_status_dlt.py` | MinIO `bronze/tfl_line_status/2026/10/27/tube_line.json` | MotherDuck `transitpulse.bronze.tfl_line_status` (+ nested dlt tables) |
+| `zoomcamp/ingest/weather_hourly_dlt.py` | `sample_data/london_weather_2026-10-27.json` | MotherDuck `transitpulse.bronze.weather_hourly` (one row per hourly array index) |
 
 dbt marts: `zoomcamp/transitPule_dbt/models/marts/`.
 
