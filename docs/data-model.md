@@ -48,11 +48,19 @@ MotherDuck/DuckDB: partition **columns** + intentional `ORDER BY` / indexes. Pos
 
 `staging_*` → `int_*` → `marts_*` with `not_null`, `unique`, and `relationships` tests.
 
+### As-built silver (MinIO)
+
+| Path | Grain | Notes |
+|------|-------|--------|
+| `silver/line_status/status_date=2026-10-27/line_status.parquet` | line × `obs_ts` | Typed Parquet from bronze via `line_status_proxy.line_status_row`; no `stop_id` |
+
 ### As-built (MotherDuck `transitpulse`)
 
 | Object | Grain | Notes |
 |--------|-------|--------|
-| `marts.line_status_snapshot` | line × `status_date` | TfL line status picker from bronze dlt tables |
-| `marts.weather_hourly` | one row per hour | `time` in Europe/London local; Open-Meteo fields from `bronze.weather_hourly` |
+| `marts.staging_line_status` | line × `status_date` | Tube picker from bronze dlt tables. Table in schema `marts` on the `motherduck` target. |
+| `marts.line_status_snapshot` | line × `status_date` | `select` from `staging_line_status`. Date filter `status_date`; group key `line_id`. |
+| `marts.staging_weather_hourly` | one row per hour | Cast `bronze.weather_hourly.time` to Europe/London wall-clock `timestamp`; passes through Open-Meteo measure columns. Table in schema `marts` on the `motherduck` target. |
+| `marts.weather_hourly` | one row per hour | `select` from `staging_weather_hourly` (`time`, `temperature_2m`, `precipitation`, `wind_speed_10m`). |
 
-Column docs: `zoomcamp/transitPule_dbt/models/marts/schema.yml`. Both marts are tables in MotherDuck. The dbt `dev` target still builds views in the local DuckDB file. See [status.md](./status.md).
+Column docs and mart tests: `zoomcamp/transitPule_dbt/models/marts/schema.yml` (tests apply to the marts, not staging). All four objects are tables in MotherDuck on the `motherduck` target. The dbt `dev` target still builds views in the local DuckDB file. See [status.md](./status.md).

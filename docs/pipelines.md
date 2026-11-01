@@ -41,31 +41,35 @@ s3://transitpulse/silver/<entity>/
 DAG `tube_status` (`zoomcamp/dags/tube_status.py`):
 
 1. `load_tube_bronze` — `uv run python ingest/tfl_line_status_dlt.py` (reads MinIO bronze; in Compose `MINIO_ENDPOINT=http://minio:9000`; dlt writes MotherDuck `transitpulse.bronze`).
-2. `build_line_status_mart` — `uv run dbt run --profiles-dir . --target motherduck --select line_status_snapshot --no-partial-parse` in `transitPule_dbt`.
+2. `build_line_status_mart` — `uv run dbt run --profiles-dir . --target motherduck --select +line_status_snapshot --no-partial-parse` in `transitPule_dbt`. The `+` builds `staging_line_status` before `line_status_snapshot`.
 
 DAG `weather_hourly` (`zoomcamp/dags/weather_hourly.py`):
 
 1. `load_weather_bronze` — `uv run python ingest/weather_hourly_dlt.py` (sample JSON in the repo; dlt writes MotherDuck `transitpulse.bronze`).
-2. `build_weather_mart` — `uv run dbt run --profiles-dir . --target motherduck --select weather_hourly --no-partial-parse`.
+2. `build_weather_mart` — `uv run dbt run --profiles-dir . --target motherduck --select +weather_hourly --no-partial-parse`. The `+` builds `staging_weather_hourly` before `weather_hourly`.
+
+Run `manual__2026-11-01T16:57:47+00:00` succeeded (dbt created `marts.staging_weather_hourly` then `marts.weather_hourly`, 16:58:05 UTC).
 
 Both tasks export `motherduck_token` from `MOTHERDUCK_TOKEN`. Prerequisite for the Tube DAG: host `uv run python lake/upload_bronze.py` after MinIO is up (host endpoint `http://localhost:9000`).
 
-DAG `transit_batch` (`zoomcamp/dags/transit_batch.py`) — one manual chain (schedule `None`). Run `manual__2026-11-01T15:42:33+00:00` succeeded on local Compose (start 15:42:34 UTC, end 15:43:19 UTC). The two DAGs above stay for separate runs:
+DAG `transit_batch` (`zoomcamp/dags/transit_batch.py`) — one manual chain (schedule `None`). Run `manual__2026-11-01T17:00:43+00:00` succeeded (start 17:00:44 UTC, end 17:01:25 UTC): silver Parquet, both bronze loads, then dbt with `+line_status_snapshot` and `+weather_hourly` (all four `marts.*` tables). Run `manual__2026-11-01T16:42:06+00:00` succeeded before weather staging (`+line_status_snapshot` only). Run `manual__2026-11-01T16:20:55+00:00` added `write_line_status_silver`. The two single-entity DAGs stay for separate runs (`tube_status` uses `+line_status_snapshot`; neither writes silver):
 
 1. `load_tube_bronze` — same as `tube_status`.
-2. `load_weather_bronze` — same as `weather_hourly`.
-3. `build_line_status_mart` — same dbt select as `tube_status`.
-4. `build_weather_mart` — same dbt select as `weather_hourly`.
+2. `write_line_status_silver` — `uv run python lake/line_status_to_silver.py` (MinIO bronze → silver Parquet; no `motherduck_token`; Compose `MINIO_ENDPOINT=http://minio:9000`).
+3. `load_weather_bronze` — same as `weather_hourly`.
+4. `build_line_status_mart` — same dbt select as `tube_status`.
+5. `build_weather_mart` — same dbt select as `weather_hourly`.
 
 ## As-built scripts
 
 | Script | Source | Destination |
 |--------|--------|-------------|
 | `zoomcamp/lake/upload_bronze.py` | `sample_data/tube_line.json`, `sample_data/london_weather.json` | MinIO `s3://transitpulse/bronze/.../2026/10/27/` (raw bytes) |
+| `zoomcamp/lake/line_status_to_silver.py` | MinIO `bronze/tfl_line_status/2026/10/27/tube_line.json` (bytes unchanged) | MinIO `silver/line_status/status_date=2026-10-27/line_status.parquet` (DuckDB Parquet; keys `line_id`, `obs_ts`). Airflow: `transit_batch` task `write_line_status_silver`; also runnable from the host with `uv run python lake/line_status_to_silver.py`. |
 | `zoomcamp/ingest/tfl_line_status_dlt.py` | MinIO `bronze/tfl_line_status/2026/10/27/tube_line.json` | MotherDuck `transitpulse.bronze.tfl_line_status` (+ nested dlt tables) |
 | `zoomcamp/ingest/weather_hourly_dlt.py` | `sample_data/london_weather_2026-10-27.json` | MotherDuck `transitpulse.bronze.weather_hourly` (one row per hourly array index) |
 
-dbt marts: `zoomcamp/transitPule_dbt/models/marts/`.
+dbt: `models/staging/staging_line_status.sql` (Tube picker) and `models/staging/staging_weather_hourly.sql` (London timezone cast from bronze). Marts `line_status_snapshot` and `weather_hourly` are thin `ref()` selects. On the `motherduck` target all four models are tables in schema `marts`. Laptop `make dbt-build`: run PASS=4, test PASS=6.
 
 ## Vertical slice (Phase 1)
 

@@ -42,7 +42,7 @@ with DAG(
             f"cd {ZOOMCAMP_ROOT}/transitPule_dbt && "
             'export motherduck_token="$MOTHERDUCK_TOKEN" && '
             "uv run dbt run --profiles-dir . --target motherduck "
-            "--select weather_hourly --no-partial-parse"
+            "--select +weather_hourly --no-partial-parse"
         ),
     )
 

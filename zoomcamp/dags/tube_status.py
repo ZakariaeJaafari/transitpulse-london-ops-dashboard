@@ -42,7 +42,7 @@ with DAG(
             f"cd {ZOOMCAMP_ROOT}/transitPule_dbt && "
             'export motherduck_token="$MOTHERDUCK_TOKEN" && '
             "uv run dbt run --profiles-dir . --target motherduck "
-            "--select line_status_snapshot --no-partial-parse"
+            "--select +line_status_snapshot --no-partial-parse"
         ),
     )
 

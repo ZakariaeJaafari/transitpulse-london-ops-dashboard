@@ -37,4 +37,4 @@ flowchart LR
 
 ## What exists today
 
-Phase **0** is shipped. Phase 1 Zoomcamp has run on the laptop and on the Azure VM (Compose, `tube_status` + `weather_hourly`, Streamlit over an SSH tunnel). The laptop combined DAG `transit_batch` run `manual__2026-11-01T15:42:33+00:00` succeeded. The VM is deallocated. Silver and stream are still open. Extras phases are not started. See [status.md](./status.md).
+Phase **0** is shipped. Phase 1 Zoomcamp has run on the laptop and on the Azure VM (Compose, `tube_status` + `weather_hourly`, Streamlit over an SSH tunnel). dbt on MotherDuck uses staging then mart for both tiles (`staging_line_status` / `line_status_snapshot`, `staging_weather_hourly` / `weather_hourly`); Airflow and `make dbt-build` use `--select +line_status_snapshot` and `+weather_hourly` so staging runs first. Laptop `weather_hourly` DAG run `manual__2026-11-01T16:57:47+00:00` and `transit_batch` run `manual__2026-11-01T17:00:43+00:00` succeeded (2026-11-01). The VM is deallocated. Stream is still open. Extras phases are not started. See [status.md](./status.md).

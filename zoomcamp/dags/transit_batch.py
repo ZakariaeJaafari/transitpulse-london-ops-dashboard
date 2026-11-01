@@ -21,7 +21,7 @@ default_args = {
 with DAG(
     dag_id="transit_batch",
     default_args=default_args,
-    description="Tube + weather: dlt bronze → dbt marts (one chain)",
+    description="Tube + weather: dlt bronze → MinIO silver → dbt marts (one chain)",
     schedule=None,
     start_date=datetime(2026, 10, 27),
     catchup=False,
@@ -33,6 +33,14 @@ with DAG(
             f"cd {ZOOMCAMP_ROOT} && "
             'export motherduck_token="$MOTHERDUCK_TOKEN" && '
             "uv run python ingest/tfl_line_status_dlt.py"
+        ),
+    )
+
+    write_line_status_silver = BashOperator(
+        task_id="write_line_status_silver",
+        bash_command=(
+            f"cd {ZOOMCAMP_ROOT} && "
+            "uv run python lake/line_status_to_silver.py"
         ),
     )
 
@@ -51,7 +59,7 @@ with DAG(
             f"cd {ZOOMCAMP_ROOT}/transitPule_dbt && "
             'export motherduck_token="$MOTHERDUCK_TOKEN" && '
             "uv run dbt run --profiles-dir . --target motherduck "
-            "--select line_status_snapshot --no-partial-parse"
+            "--select +line_status_snapshot --no-partial-parse"
         ),
     )
 
@@ -61,12 +69,13 @@ with DAG(
             f"cd {ZOOMCAMP_ROOT}/transitPule_dbt && "
             'export motherduck_token="$MOTHERDUCK_TOKEN" && '
             "uv run dbt run --profiles-dir . --target motherduck "
-            "--select weather_hourly --no-partial-parse"
+            "--select +weather_hourly --no-partial-parse"
         ),
     )
 
     (
         load_tube_bronze
+        >> write_line_status_silver
         >> load_weather_bronze
         >> build_line_status_mart
         >> build_weather_mart
