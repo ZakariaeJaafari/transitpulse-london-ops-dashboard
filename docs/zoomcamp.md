@@ -19,7 +19,7 @@ Sources: TfL Open Data + Open-Meteo.
 - Dedicated GitHub repo.
 - Secrets only in `.env` / GitHub Actions secrets — never committed or printed in CI logs.
 - From **`zoomcamp/`**, `docker compose up` starts the declared graded services (when Compose exists). FastAPI is not in that file.
-- `zoomcamp/Makefile`: `up` / `test` / `dbt-build` (when added). An `api` target is extras-only.
+- `zoomcamp/Makefile`: `up` / `test` / `dbt-build`. An `api` target is extras-only.
 - Test from a **clean clone** before submit.
 
 ## Scope trap

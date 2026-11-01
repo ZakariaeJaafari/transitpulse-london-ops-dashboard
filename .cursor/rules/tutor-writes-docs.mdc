@@ -1,0 +1,10 @@
+---
+description: In lessons, the agent writes the docs instead of asking the user to paste them
+alwaysApply: true
+---
+
+# Tutor writes the docs
+
+When a lesson is a documentation edit, write the files yourself in the same turn.
+
+If the session is in Ask mode and the files cannot be edited, say so and ask the user to switch to Agent mode. Do not hand them the markdown to paste as the lesson.

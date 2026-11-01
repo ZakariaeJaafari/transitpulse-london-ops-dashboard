@@ -285,7 +285,7 @@ Optional in parallel (`extras/`): FastAPI metrics, then Next.js on that API — 
 
 ## 13. Going the extra mile checklist
 
-- [ ] Unit tests + `zoomcamp/Makefile`
+- [x] Unit tests + `zoomcamp/Makefile`
 - [ ] GitHub Actions CI green (`zoomcamp/` compose/DAG/dbt)
 - [ ] FastAPI in **`extras/api/`** with OpenAPI docs (portfolio only)
 - [ ] Next.js in **`extras/nextjs/`** talking only to FastAPI (portfolio only)

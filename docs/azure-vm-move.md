@@ -2,7 +2,7 @@
 
 Certification log for the Phase 1 cloud step: the graded `zoomcamp/` slice ran on a laptop first, then the same Compose stack was started on one Azure VM. This page records **what has actually run**. The how-to for a fresh apply is [cloud-and-free-demo.md](./cloud-and-free-demo.md). Decision: [0002-azure-credit-vm.md](./decisions/0002-azure-credit-vm.md).
 
-**As of:** 2026-10-30.
+**As of:** 2026-10-31.
 
 Data on this project is **Data provided by Transport for London** / Powered by TfL Open Data, plus Open-Meteo. This is not an official TfL product.
 
@@ -11,6 +11,7 @@ Data on this project is **Data provided by Transport for London** / Powered by T
 - Cloud compute is an **Azure VM** created with **Terraform** in `zoomcamp/terraform/`, paid from a **$100 Azure for Students credit**.
 - The lake stays **MinIO** on that VM. No Azure Blob, Azure SQL, or other Azure data service.
 - The warehouse is **MotherDuck** database `transitpulse`. dlt loads `bronze`, and dbt `--target motherduck` builds `marts.line_status_snapshot` and `marts.weather_hourly`. The laptop DuckDB file is the dbt `dev` target only.
+- Streamlit on the VM reads those MotherDuck marts. Port 8501 stays off the security group; the laptop reaches it through an SSH tunnel.
 
 ## Done on the laptop before the VM
 
@@ -124,9 +125,19 @@ docker compose exec airflow airflow dags trigger tube_status
 
 Those runs load `transitpulse.bronze` and build the two marts with `dbt run --target motherduck`. After the session, `az vm deallocate --resource-group transitpulse-rg --name transitpulse-zoomcamp` returned to the shell prompt with no error.
 
+## Done — Streamlit on the VM
+
+2026-10-31. `az vm start` reached a running VM. SSH as `ubuntu` worked.
+
+1. On the VM, `uv` was installed for the `ubuntu` user. From `zoomcamp/`: `uv sync`, then `uv run streamlit run dashboard/app.py --server.address 127.0.0.1 --server.port 8501 --server.headless true`.
+2. The first process failed: `Invalid MotherDuck token.` The VM `.env` still had a Windows carriage return on the token line. `sed -i 's/\r$//' .env`, then `export motherduck_token="$MOTHERDUCK_TOKEN"`.
+3. The second process listened on `127.0.0.1:8501` at 20:00:00 UTC. The laptop tunnel was `ssh -L 8502:localhost:8501`. Port 8501 was not added to the security group.
+4. At 20:00:38 UTC the page rendered both charts: the Tube tile and the weather tile, from MotherDuck `marts.line_status_snapshot` and `marts.weather_hourly`.
+5. Streamlit was stopped, the SSH session closed, and `az vm deallocate --resource-group transitpulse-rg --name transitpulse-zoomcamp` returned to the prompt with no error.
+
 ## Not done yet
 
-- Run Streamlit on the VM. The graded dashboard still runs on the laptop and reads MotherDuck.
+- None for the Phase 1 VM slice. Deallocate the VM whenever it is not in use.
 
 ## Secrets that stay off GitHub
 

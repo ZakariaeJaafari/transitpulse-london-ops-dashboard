@@ -37,4 +37,4 @@ flowchart LR
 
 ## What exists today
 
-Phase **0** is shipped. Phase 1 Zoomcamp laptop slice is **in progress** (see [status.md](./status.md)). Terraform code targets an Azure credit VM and has **not** been applied. Extras phases are not started.
+Phase **0** is shipped. Phase 1 Zoomcamp has run on the laptop and on the Azure VM (Compose, both DAGs, Streamlit over an SSH tunnel). The VM is deallocated. A combined DAG, silver, and stream are still open. Extras phases are not started. See [status.md](./status.md).

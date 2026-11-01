@@ -1,6 +1,6 @@
 # Implementation status
 
-**As of:** 2026-10-30
+**As of:** 2026-10-31
 
 This repo is **spec-first**. Do not assume Compose, dbt, Airflow, FastAPI, or Next.js exist until they are listed as shipped below.
 
@@ -24,18 +24,18 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 | Dashboard (graded) | `zoomcamp/dashboard/` Streamlit (reads MotherDuck `marts.line_status_snapshot`, `marts.weather_hourly`) |
 | Sample | `zoomcamp/sample_data/` |
 | CI | `.github/workflows/ci.yml` — `uv sync` + `pytest` in `zoomcamp/` on push |
+| Makefile | `zoomcamp/Makefile` — `up`, `test`, `dbt-build` (no extras API target) |
 | Cloud IaC (Phase 1) | `zoomcamp/terraform/` applied in **austriaeast** zone 1: Ubuntu VM `transitpulse-zoomcamp` (`Standard_B2s_v2`), VNet, public IP, NSG on subnet `transitpulse-public` (SSH :22 from the operator CIDR only). Log: [azure-vm-move.md](./azure-vm-move.md). |
-| Cloud Compose (Phase 1) | On that VM, MinIO and Airflow are healthy. `tube_status` run `manual__2026-10-30T19:09:45+00:00` and `weather_hourly` run `manual__2026-10-30T19:09:48+00:00` succeeded (2026-10-30): MotherDuck `transitpulse.bronze` and the two marts. UIs from the laptop use SSH tunnels: Airflow `localhost:8081`, MinIO console `localhost:19001`. Log: [azure-vm-move.md](./azure-vm-move.md). VM deallocated after that session. |
+| Cloud Compose (Phase 1) | On that VM, MinIO and Airflow are healthy. `tube_status` run `manual__2026-10-30T19:09:45+00:00` and `weather_hourly` run `manual__2026-10-30T19:09:48+00:00` succeeded (2026-10-30): MotherDuck `transitpulse.bronze` and the two marts. UIs from the laptop use SSH tunnels: Airflow `localhost:8081`, MinIO console `localhost:19001`. On 2026-10-31 Streamlit ran on the VM host (not a Compose service), tunneled at `localhost:8502`, and rendered both MotherDuck tiles. Log: [azure-vm-move.md](./azure-vm-move.md). VM deallocated after that session. |
 
 ## Target (not built yet)
 
 | Area | Target |
 |------|--------|
-| Local stack (full) | `Makefile`, Redpanda + Flink in Compose |
+| Local stack (full) | Redpanda + Flink in Compose |
 | Batch ingest (orchestrated) | One DAG chain that runs Tube and weather together |
 | Stream | `zoomcamp/` producers → Redpanda → PyFlink |
 | Lake (silver + orchestration) | Airflow-driven bronze/silver on MinIO beyond manual upload |
-| Cloud (Phase 1) | Streamlit on the VM. Deallocate the VM whenever it is not in use. |
 | API (extras) | `extras/api/` FastAPI `/health` + `/metrics/*` + `/ops/freshness` |
 | UI (extras) | `extras/nextjs/` — browser → FastAPI only |
 | ML (extras) | `extras/ml/` — Phase 2+ |
@@ -46,7 +46,7 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 | Phase | Intent | Status |
 |-------|--------|--------|
 | 0 | Spec, LAYOUT, docs, agent context | Shipped |
-| 1 Zoomcamp | Vertical slice in `zoomcamp/` + Terraform free VM (`zoomcamp/terraform/`) | In progress (local slice done; VM Airflow loaded MotherDuck and both DAGs succeeded 2026-10-30; VM deallocated; Streamlit on the VM still open) |
+| 1 Zoomcamp | Vertical slice in `zoomcamp/` + Terraform free VM (`zoomcamp/terraform/`) | VM slice done (Compose, both DAGs, Streamlit on the VM, deallocated 2026-10-31). Still open on the laptop: one combined DAG, silver, stream. |
 | 1 extras API | FastAPI metrics in `extras/api/` on gold marts | Not started |
 | 1 extras UI | Next.js in `extras/nextjs/` calling FastAPI only | Not started |
 | 2 | Feature marts, XGBoost, MLflow, batch scores (`extras/ml/`) | Not started |

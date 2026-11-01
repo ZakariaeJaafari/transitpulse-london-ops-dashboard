@@ -5,7 +5,10 @@ models:
     description: >
       Grain: one row per line_id and status_date. Current status per Tube line
       per dlt load date, from bronze TfL line-status tables. Picker matches
-      zoomcamp/ingest/line_status_proxy.py.
+      zoomcamp/ingest/line_status_proxy.py. MotherDuck does not apply
+      BigQuery-style physical partitions; filter by date on status_date, and
+      sort or group by line_id for the Tube tile (one row per line per load —
+      a logical sort key, not a warehouse partition).
     columns:
       - name: line_id
         description: >
@@ -38,7 +41,10 @@ models:
   - name: weather_hourly
     description: >
       Grain: one row per hour. London Open-Meteo hourly forecast from
-      bronze.weather_hourly (sample london_weather_2026-10-27.json).
+      bronze.weather_hourly (sample london_weather_2026-10-27.json). MotherDuck
+      does not apply BigQuery-style physical partitions; filter by time on time
+      (Europe/London) and use the same column to sort or group hourly rows —
+      there is no line dimension to cluster on.
     columns:
       - name: time
         description: >

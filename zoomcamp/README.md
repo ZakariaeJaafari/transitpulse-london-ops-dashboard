@@ -6,11 +6,23 @@ This folder is the **DataTalksClub DE Zoomcamp course project**.
 
 Dataset (TfL + Open-Meteo) → **data lake (MinIO)** → **warehouse (MotherDuck)** → **dbt** → **dashboard (2 tiles)**.
 
-Orchestration: Airflow. Batch ingest: **dlt** (+ PySpark as needed). Stream (optional track): Redpanda + PyFlink.
+**Batch (this slice):** Airflow DAGs `tube_status` and `weather_hourly` run dlt into MotherDuck `transitpulse.bronze`, then dbt `--target motherduck` builds `marts.line_status_snapshot` and `marts.weather_hourly`. The Tube load reads MinIO. The weather load reads `sample_data/`.
+
+**Stream (later):** Redpanda and PyFlink stay a target. No stream producer is in `zoomcamp/` yet. PySpark is not in this slice.
+
+![TransitPulse Tube status and London weather tiles](dashboard/tiles.png)
 
 ## How to run
 
 Commands below assume you are **in this folder** (`zoomcamp/`).
+
+**Makefile** (same folder):
+
+```bash
+make up          # docker compose up -d --build --wait
+make test        # uv sync --all-groups && uv run pytest
+make dbt-build   # .env → motherduck_token; dbt run + test (line_status_snapshot, weather_hourly)
+```
 
 **As-built (local laptop):**
 
