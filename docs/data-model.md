@@ -17,7 +17,7 @@ Use these names in silver and gold (do not invent parallel IDs):
 
 ## Delay / reliability (define before coding)
 
-TfL arrivals `timeToStation` is a **prediction**, not delay vs timetable.
+TfL arrivals `timeToStation` is a **prediction** (seconds until the train is expected at the stop), not delay vs timetable. In code and marts use **`time_to_station_sec`** when normalized from the API field `timeToStation`.
 
 Until an ADR says otherwise, Phase 1 metrics use an explicit **proxy**, for example:
 
@@ -41,8 +41,28 @@ MotherDuck/DuckDB: partition **columns** + intentional `ORDER BY` / indexes. Pos
 
 ## Volume controls
 
-- Poll a **StopPoint subset** (document IDs in code + `sample_data/`).
-- Keep `sample_data/` bronze snippets so the demo runs without live TfL.
+- Poll a **StopPoint subset** only — canonical list in `zoomcamp/ingest/stoppoints.py` (`STOPPOINTS`) and mirror `zoomcamp/sample_data/stoppoints.json`. Each `stop_id` is the TfL **naptanId**.
+- Keep other `sample_data/` bronze snippets so the demo runs without live TfL.
+
+| `stop_id` | Name |
+|-----------|------|
+| `940GZZLUOXC` | Oxford Circus |
+| `940GZZLUKSX` | King's Cross St. Pancras |
+| `940GZZLUWLO` | Waterloo |
+| `940GZZLUVIC` | Victoria |
+
+### Arrival prediction rows (ingest proxy)
+
+`zoomcamp/ingest/arrivals_proxy.py` → `arrival_rows()` keeps **tube** predictions whose `naptanId` is in `STOPPOINTS`. Offline fixture: `sample_data/arrivals_oxford_circus.json` (Oxford Circus snapshot, 2026-11-01 17:13 UTC).
+
+| Field | Source |
+|-------|--------|
+| `stop_id` | `naptanId` |
+| `line_id` | `lineId` |
+| `vehicle_id` | `vehicleId` |
+| `expected_arrival` | `expectedArrival` |
+| `time_to_station_sec` | `timeToStation` (int) |
+| `towards` | `towards` |
 
 ## dbt layers
 

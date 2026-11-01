@@ -1,0 +1,20 @@
+[
+  {
+    "naptanId": "940GZZLUOXC",
+    "lineId": "bakerloo",
+    "vehicleId": "007",
+    "expectedArrival": "2026-11-01T17:15:24Z",
+    "timeToStation": 123,
+    "towards": "Queen's Park",
+    "modeName": "tube"
+  },
+  {
+    "naptanId": "940GZZLUOXC",
+    "lineId": "victoria",
+    "vehicleId": "235",
+    "expectedArrival": "2026-11-01T17:14:26Z",
+    "timeToStation": 65,
+    "towards": "Brixton",
+    "modeName": "tube"
+  }
+]

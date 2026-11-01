@@ -22,7 +22,10 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 | Warehouse (local dev) | DuckDB file `zoomcamp/data/transitpulse.duckdb` for dbt **dev** target only (`marts.*` views); not the live bronze path after Lesson 24 |
 | Warehouse (MotherDuck) | `transitpulse`: `bronze.*` from dlt. dbt **motherduck** target builds `marts.staging_line_status` → `marts.line_status_snapshot` and `marts.staging_weather_hourly` → `marts.weather_hourly` (thin marts select from staging). `make dbt-build` on 2026-11-01: run PASS=4, test PASS=6. No local attach. |
 | Dashboard (graded) | `zoomcamp/dashboard/` Streamlit (reads MotherDuck `marts.line_status_snapshot`, `marts.weather_hourly`) |
-| Sample | `zoomcamp/sample_data/` |
+| Sample | `zoomcamp/sample_data/` (includes `stoppoints.json` mirroring `ingest/stoppoints.py`) |
+| StopPoint subset | `zoomcamp/ingest/stoppoints.py` — four curated naptanIds for future arrivals stream; `tests/test_stoppoints.py` |
+| Arrivals proxy (offline) | `zoomcamp/ingest/arrivals_proxy.py` + `sample_data/arrivals_oxford_circus.json`; `tests/test_arrivals_proxy.py` — tube-only, subset stops; `time_to_station_sec` is TfL prediction, not delay |
+| Arrivals poll (pure) | `zoomcamp/ingest/tfl_arrivals_producer.py` — `poll_arrivals`, `publish_arrivals(messages, send)` (partition key `stop_id`); `tests/test_tfl_arrivals_producer.py` (injected fetch/send, fixed `obs_ts`) |
 | CI | `.github/workflows/ci.yml` — `uv sync` + `pytest` in `zoomcamp/` on push |
 | Makefile | `zoomcamp/Makefile` — `up`, `test`, `dbt-build` (no extras API target). On Windows, `dbt-build` uses `bash.exe` and loads `.env` from the Makefile directory. The run select is `+line_status_snapshot +weather_hourly`. |
 | Cloud IaC (Phase 1) | `zoomcamp/terraform/` applied in **austriaeast** zone 1: Ubuntu VM `transitpulse-zoomcamp` (`Standard_B2s_v2`), VNet, public IP, NSG on subnet `transitpulse-public` (SSH :22 from the operator CIDR only). Log: [azure-vm-move.md](./azure-vm-move.md). |
@@ -37,7 +40,6 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 | API (extras) | `extras/api/` FastAPI `/health` + `/metrics/*` + `/ops/freshness` |
 | UI (extras) | `extras/nextjs/` — browser → FastAPI only |
 | ML (extras) | `extras/ml/` — Phase 2+ |
-| StopPoint subset | Curated stop list for arrivals stream / API snapshots |
 
 ## Phase tracker
 

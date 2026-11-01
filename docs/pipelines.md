@@ -21,6 +21,8 @@ Target DAG steps:
 2. `weather_poll_producer` — Open-Meteo current → `weather.london`.
 3. PyFlink — windows (e.g. 5-min delay **proxies** / status severity) → MinIO bronze/silver and/or staging upserts.
 
+**As-built (poll logic only):** `zoomcamp/ingest/tfl_arrivals_producer.py` — `poll_arrivals(fetch, obs_ts)` walks `STOPPOINTS`, normalizes with `arrival_rows`, attaches `obs_ts`; `publish_arrivals(messages, send)` calls `send(TOPIC, stop_id, message)`; `TOPIC = "tfl.arrivals"`. No HTTP, Redpanda, or Compose yet.
+
 ## Medallion on MinIO
 
 Suggested prefixes (adjust in an ADR if the first implementation differs, then update this page):
