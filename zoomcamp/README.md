@@ -6,7 +6,7 @@ This folder is the **DataTalksClub DE Zoomcamp course project**.
 
 Dataset (TfL + Open-Meteo) → **data lake (MinIO)** → **warehouse (MotherDuck)** → **dbt** → **dashboard (2 tiles)**.
 
-**Batch (this slice):** Airflow DAGs `tube_status` and `weather_hourly` run dlt into MotherDuck `transitpulse.bronze`, then dbt `--target motherduck` builds `marts.line_status_snapshot` and `marts.weather_hourly`. The Tube load reads MinIO. The weather load reads `sample_data/`.
+**Batch (this slice):** Airflow DAGs `tube_status`, `weather_hourly`, and combined `transit_batch` run dlt into MotherDuck `transitpulse.bronze`, then dbt `--target motherduck` builds `marts.line_status_snapshot` and `marts.weather_hourly`. The Tube load reads MinIO. The weather load reads `sample_data/`. Use `transit_batch` for one trigger: tube bronze → weather bronze → both marts.
 
 **Stream (later):** Redpanda and PyFlink stay a target. No stream producer is in `zoomcamp/` yet. PySpark is not in this slice.
 
@@ -35,8 +35,9 @@ docker compose up -d --build --wait   # waits until Airflow /health is OK (~1–
 uv sync
 uv run python lake/upload_bronze.py   # host → http://localhost:9000
 # Console: http://localhost:9001 → bucket transitpulse → bronze/…
-# Airflow UI: http://localhost:8080 — login admin / admin (override AIRFLOW_WWW_USER / AIRFLOW_WWW_USER_PASSWORD in .env)
-# Unpause DAG tube_status → load_tube_bronze → build_line_status_mart
+# Airflow UI: http://127.0.0.1:8080 — login admin / admin (override AIRFLOW_WWW_USER / AIRFLOW_WWW_USER_PASSWORD in .env)
+# On this Windows host, http://localhost:8080 is reset (IPv6 localhost hits wslrelay). Use 127.0.0.1.
+# Unpause DAG transit_batch (or tube_status / weather_hourly separately)
 ```
 
 Airflow runs in Docker (not on Windows natively). The repo is mounted at `/opt/transitpulse/zoomcamp`; DAG tasks use `http://minio:9000` for the lake. Keep `MINIO_ENDPOINT=http://localhost:9000` in `.env` for host commands.

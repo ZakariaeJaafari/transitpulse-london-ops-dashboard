@@ -157,7 +157,8 @@ git clone <your-repo-url> transitpulse
 cd transitpulse/zoomcamp
 cp .env.example .env   # add TFL_APP_KEY, MOTHERDUCK_TOKEN, etc.
 docker compose up -d
-# Airflow UI: http://localhost:8080
+# Airflow UI: http://127.0.0.1:8080
+# Windows: http://localhost:8080 can be reset by wslrelay on IPv6. Use 127.0.0.1.
 # MinIO console: http://localhost:9001
 # Streamlit / Metabase: see compose ports
 ```

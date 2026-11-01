@@ -1,6 +1,6 @@
 # Implementation status
 
-**As of:** 2026-10-31
+**As of:** 2026-11-01
 
 This repo is **spec-first**. Do not assume Compose, dbt, Airflow, FastAPI, or Next.js exist until they are listed as shipped below.
 
@@ -16,7 +16,7 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 | Agent context | `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.cursor/skills/` |
 | ADR | [0001-extras-nextjs-fastapi.md](./decisions/0001-extras-nextjs-fastapi.md) — Next.js on FastAPI |
 | Local lake (MinIO) | `zoomcamp/docker-compose.yml` (MinIO + Airflow), `zoomcamp/.env.example`, `zoomcamp/lake/upload_bronze.py` → `transitpulse` bronze prefixes |
-| Orchestration (local) | `zoomcamp/dags/tube_status.py` and `zoomcamp/dags/weather_hourly.py` — dlt into MotherDuck `transitpulse.bronze` → dbt `--target motherduck` (Compose Airflow on `:8080`, `MINIO_ENDPOINT=http://minio:9000` in the container) |
+| Orchestration (local) | `zoomcamp/dags/tube_status.py`, `weather_hourly.py`, and `transit_batch.py` (tube bronze → weather bronze → both marts, `--target motherduck`). `transit_batch` run `manual__2026-11-01T15:42:33+00:00` succeeded (start 15:42:34 UTC, end 15:43:19 UTC). Compose Airflow listens on `:8080`. On this Windows host open **http://127.0.0.1:8080** — `localhost` is IPv6 and `wslrelay` resets that connection. Container `MINIO_ENDPOINT=http://minio:9000`. |
 | Python env | `zoomcamp/pyproject.toml` + `uv.lock` (uv) |
 | Batch ingest (dlt) | `zoomcamp/ingest/tfl_line_status_dlt.py`, `weather_hourly_dlt.py`, `fetch_raw.py` — dlt → MotherDuck `transitpulse.bronze.*` (`motherduck_token` / `MOTHERDUCK_TOKEN`) |
 | Warehouse (local dev) | DuckDB file `zoomcamp/data/transitpulse.duckdb` for dbt **dev** target only (`marts.*` views); not the live bronze path after Lesson 24 |
@@ -33,7 +33,6 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 | Area | Target |
 |------|--------|
 | Local stack (full) | Redpanda + Flink in Compose |
-| Batch ingest (orchestrated) | One DAG chain that runs Tube and weather together |
 | Stream | `zoomcamp/` producers → Redpanda → PyFlink |
 | Lake (silver + orchestration) | Airflow-driven bronze/silver on MinIO beyond manual upload |
 | API (extras) | `extras/api/` FastAPI `/health` + `/metrics/*` + `/ops/freshness` |
@@ -46,7 +45,7 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 | Phase | Intent | Status |
 |-------|--------|--------|
 | 0 | Spec, LAYOUT, docs, agent context | Shipped |
-| 1 Zoomcamp | Vertical slice in `zoomcamp/` + Terraform free VM (`zoomcamp/terraform/`) | VM slice done (Compose, both DAGs, Streamlit on the VM, deallocated 2026-10-31). Still open on the laptop: one combined DAG, silver, stream. |
+| 1 Zoomcamp | Vertical slice in `zoomcamp/` + Terraform free VM (`zoomcamp/terraform/`) | VM slice done (Compose, `tube_status` and `weather_hourly`, Streamlit on the VM, deallocated 2026-10-31). Laptop `transit_batch` run `manual__2026-11-01T15:42:33+00:00` succeeded. Silver and stream are still open. |
 | 1 extras API | FastAPI metrics in `extras/api/` on gold marts | Not started |
 | 1 extras UI | Next.js in `extras/nextjs/` calling FastAPI only | Not started |
 | 2 | Feature marts, XGBoost, MLflow, batch scores (`extras/ml/`) | Not started |
@@ -56,6 +55,6 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 
 - **Canonical gold** for Streamlit, FastAPI, and (via API) Next.js = MotherDuck dbt marts, not MinIO “gold files.”
 - Prefer one thin working slice in **`zoomcamp/`** over standing up every container.
-- `cd zoomcamp && docker compose up -d --wait` starts **MinIO + Airflow** (UI `:8080`; Compose healthcheck on `/health`, entrypoint clears stale webserver PIDs on the `airflow_data` volume). Upload bronze from the **host** (`uv run python lake/upload_bronze.py` uses `localhost:9000`). DAG tasks use `http://minio:9000`. Do not add FastAPI or Next.js to that Compose file.
+- `cd zoomcamp && docker compose up -d --wait` starts **MinIO + Airflow** (container healthcheck on `http://127.0.0.1:8080/health`). On this Windows laptop the browser URL is **http://127.0.0.1:8080**; `http://localhost:8080` is reset by `wslrelay` on IPv6. Upload bronze from the **host** (`uv run python lake/upload_bronze.py` uses `localhost:9000`). DAG tasks use `http://minio:9000`. Do not add FastAPI or Next.js to that Compose file.
 - Phase 1 compute is one Azure VM from a **$100 credit** ([ADR 0002](./decisions/0002-azure-credit-vm.md)). Laptop slice **before** `terraform apply`. Lake stays MinIO — do not add Azure Blob. Deallocate the VM when idle. See [cloud-and-free-demo.md](./cloud-and-free-demo.md).
 - Next.js must not embed `MOTHERDUCK_TOKEN`.

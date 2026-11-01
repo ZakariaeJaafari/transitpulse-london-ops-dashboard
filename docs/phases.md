@@ -37,4 +37,4 @@ flowchart LR
 
 ## What exists today
 
-Phase **0** is shipped. Phase 1 Zoomcamp has run on the laptop and on the Azure VM (Compose, both DAGs, Streamlit over an SSH tunnel). The VM is deallocated. A combined DAG, silver, and stream are still open. Extras phases are not started. See [status.md](./status.md).
+Phase **0** is shipped. Phase 1 Zoomcamp has run on the laptop and on the Azure VM (Compose, `tube_status` + `weather_hourly`, Streamlit over an SSH tunnel). The laptop combined DAG `transit_batch` run `manual__2026-11-01T15:42:33+00:00` succeeded. The VM is deallocated. Silver and stream are still open. Extras phases are not started. See [status.md](./status.md).

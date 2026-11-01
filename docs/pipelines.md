@@ -41,14 +41,21 @@ s3://transitpulse/silver/<entity>/
 DAG `tube_status` (`zoomcamp/dags/tube_status.py`):
 
 1. `load_tube_bronze` — `uv run python ingest/tfl_line_status_dlt.py` (reads MinIO bronze; in Compose `MINIO_ENDPOINT=http://minio:9000`; dlt writes MotherDuck `transitpulse.bronze`).
-2. `build_line_status_mart` — `uv run dbt run --profiles-dir . --target motherduck --select line_status_snapshot` in `transitPule_dbt`.
+2. `build_line_status_mart` — `uv run dbt run --profiles-dir . --target motherduck --select line_status_snapshot --no-partial-parse` in `transitPule_dbt`.
 
 DAG `weather_hourly` (`zoomcamp/dags/weather_hourly.py`):
 
 1. `load_weather_bronze` — `uv run python ingest/weather_hourly_dlt.py` (sample JSON in the repo; dlt writes MotherDuck `transitpulse.bronze`).
-2. `build_weather_mart` — `uv run dbt run --profiles-dir . --target motherduck --select weather_hourly`.
+2. `build_weather_mart` — `uv run dbt run --profiles-dir . --target motherduck --select weather_hourly --no-partial-parse`.
 
 Both tasks export `motherduck_token` from `MOTHERDUCK_TOKEN`. Prerequisite for the Tube DAG: host `uv run python lake/upload_bronze.py` after MinIO is up (host endpoint `http://localhost:9000`).
+
+DAG `transit_batch` (`zoomcamp/dags/transit_batch.py`) — one manual chain (schedule `None`). Run `manual__2026-11-01T15:42:33+00:00` succeeded on local Compose (start 15:42:34 UTC, end 15:43:19 UTC). The two DAGs above stay for separate runs:
+
+1. `load_tube_bronze` — same as `tube_status`.
+2. `load_weather_bronze` — same as `weather_hourly`.
+3. `build_line_status_mart` — same dbt select as `tube_status`.
+4. `build_weather_mart` — same dbt select as `weather_hourly`.
 
 ## As-built scripts
 
@@ -72,4 +79,4 @@ Full stack on a free VM will not fit; lean Compose is documented in [cloud-and-f
 
 Code lives under **`zoomcamp/`** (see [LAYOUT.md](../LAYOUT.md)). FastAPI, Next.js, and ML stay in **`extras/`**. Next.js does not belong in the Phase 1 Zoomcamp slice.
 
-As-built: local dlt scripts + dbt marts in DuckDB — see [status.md](./status.md).
+As-built: dlt into MotherDuck `transitpulse.bronze` and dbt marts on the `motherduck` target — see [status.md](./status.md).
