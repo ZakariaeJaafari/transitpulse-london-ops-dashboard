@@ -21,7 +21,7 @@ Target DAG steps:
 2. `weather_poll_producer` — Open-Meteo current → `weather.london`.
 3. PyFlink — windows (e.g. 5-min delay **proxies** / status severity) → MinIO bronze/silver and/or staging upserts.
 
-**As-built (poll logic only):** `zoomcamp/ingest/tfl_arrivals_producer.py` — `poll_arrivals(fetch, obs_ts)` walks `STOPPOINTS`, normalizes with `arrival_rows`, attaches `obs_ts`; `publish_arrivals(messages, send)` calls `send(TOPIC, stop_id, message)`; `TOPIC = "tfl.arrivals"`. No HTTP, Redpanda, or Compose yet.
+**As-built:** `zoomcamp/ingest/tfl_arrivals_producer.py` — pure `poll_arrivals` / `publish_arrivals(messages, send)`; `TOPIC = "tfl.arrivals"`. Host scripts: `publish_sample_arrivals.py` (sample JSON → `127.0.0.1:19092`, `flush()`), `consume_sample_arrivals.py` (consumer group `transitpulse-arrivals-demo`, `earliest`, prints two records). Pytest still injects `send`; no broker in CI. PyFlink not wired yet.
 
 ## Medallion on MinIO
 

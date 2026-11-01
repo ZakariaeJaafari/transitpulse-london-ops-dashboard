@@ -26,12 +26,20 @@ make dbt-build   # .env next to the Makefile; dbt run (+line_status_snapshot +we
 
 **As-built (local laptop):**
 
-MinIO lake (API `9000`, console `9001`) + Airflow (`8080`):
+MinIO lake (API `9000`, console `9001`) + Airflow (`8080`) + Redpanda (Kafka on host `127.0.0.1:19092`):
 
 ```bash
 cd zoomcamp
 cp .env.example .env   # add MINIO_ROOT_USER / MINIO_ROOT_PASSWORD (and other keys)
 docker compose up -d --build --wait   # waits until Airflow /health is OK (~1–3 min first start)
+docker compose up -d redpanda
+docker compose exec redpanda rpk cluster health
+docker compose exec redpanda rpk topic create tfl.arrivals -p 1 -r 1
+docker compose exec redpanda rpk topic list
+# Host Kafka bootstrap: 127.0.0.1:19092 (not localhost on this Windows host — IPv6/wslrelay)
+uv run python ingest/publish_sample_arrivals.py
+uv run python ingest/consume_sample_arrivals.py
+docker compose exec redpanda rpk topic consume tfl.arrivals -o start -n 2 -f 'key=%k%n%v%n'
 uv sync
 uv run python lake/upload_bronze.py   # host → http://localhost:9000
 uv run python lake/line_status_to_silver.py   # bronze JSON → silver Parquet (DuckDB); uses 127.0.0.1 if localhost fails

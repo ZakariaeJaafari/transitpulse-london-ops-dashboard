@@ -15,7 +15,8 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 | Living wiki | This `docs/` folder including [phases.md](./phases.md) |
 | Agent context | `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.cursor/skills/` |
 | ADR | [0001-extras-nextjs-fastapi.md](./decisions/0001-extras-nextjs-fastapi.md) — Next.js on FastAPI |
-| Local lake (MinIO) | `zoomcamp/docker-compose.yml` (MinIO + Airflow), `zoomcamp/.env.example`, `zoomcamp/lake/upload_bronze.py` → bronze prefixes; `zoomcamp/lake/line_status_to_silver.py` → typed silver Parquet (host or `transit_batch` task `write_line_status_silver`). Gold stays MotherDuck marts. |
+| Local lake (MinIO) | `zoomcamp/docker-compose.yml` (MinIO + Airflow + Redpanda), `zoomcamp/.env.example`, `zoomcamp/lake/upload_bronze.py` → bronze prefixes; `zoomcamp/lake/line_status_to_silver.py` → typed silver Parquet (host or `transit_batch` task `write_line_status_silver`). Gold stays MotherDuck marts. |
+| Redpanda (laptop) | `zoomcamp/docker-compose.yml` service `redpanda` — Kafka external listener `127.0.0.1:19092` (host clients; not `localhost` on this Windows laptop). Topic `tfl.arrivals` (1p/RF1) via `rpk topic create`. Sample publish/consume: `uv run python ingest/publish_sample_arrivals.py`, `uv run python ingest/consume_sample_arrivals.py` (`confluent-kafka`); or verify with `rpk topic consume tfl.arrivals -o start -n 2`. VM Compose unchanged; Flink not in Compose yet. |
 | Orchestration (local) | `zoomcamp/dags/tube_status.py`, `weather_hourly.py`, and `transit_batch.py`. `transit_batch`: `load_tube_bronze` → `write_line_status_silver` → `load_weather_bronze` → `build_line_status_mart` (`--select +line_status_snapshot --no-partial-parse`) → `build_weather_mart` (`--select +weather_hourly --no-partial-parse`). `weather_hourly` DAG run `manual__2026-11-01T16:57:47+00:00` succeeded; dbt built `staging_weather_hourly` then `weather_hourly` (16:58:05 UTC, log path `/opt/transitpulse`). `transit_batch` run `manual__2026-11-01T17:00:43+00:00` succeeded (start 17:00:44 UTC, end 17:01:25 UTC); Tube dbt task built `staging_line_status` then `line_status_snapshot`, weather dbt task built `staging_weather_hourly` then `weather_hourly`. Earlier laptop runs: `manual__2026-11-01T16:42:06+00:00` (Tube staging mart only), `manual__2026-11-01T16:20:55+00:00` (with silver task), `manual__2026-11-01T15:42:33+00:00` (before silver). Compose Airflow `:8080`; on this Windows host use **http://127.0.0.1:8080**. Container `MINIO_ENDPOINT=http://minio:9000`. |
 | Python env | `zoomcamp/pyproject.toml` + `uv.lock` (uv) |
 | Batch ingest (dlt) | `zoomcamp/ingest/tfl_line_status_dlt.py`, `weather_hourly_dlt.py`, `fetch_raw.py` — dlt → MotherDuck `transitpulse.bronze.*` (`motherduck_token` / `MOTHERDUCK_TOKEN`) |
@@ -35,7 +36,7 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 
 | Area | Target |
 |------|--------|
-| Local stack (full) | Redpanda + Flink in Compose |
+| Local stack (full) | PyFlink in Compose; stream producer wired to Redpanda |
 | Stream | `zoomcamp/` producers → Redpanda → PyFlink |
 | API (extras) | `extras/api/` FastAPI `/health` + `/metrics/*` + `/ops/freshness` |
 | UI (extras) | `extras/nextjs/` — browser → FastAPI only |
@@ -56,6 +57,6 @@ Canonical spec: [PROJECT.md](../PROJECT.md). Phases: [phases.md](./phases.md). A
 
 - **Canonical gold** for Streamlit, FastAPI, and (via API) Next.js = MotherDuck dbt marts, not MinIO “gold files.”
 - Prefer one thin working slice in **`zoomcamp/`** over standing up every container.
-- `cd zoomcamp && docker compose up -d --wait` starts **MinIO + Airflow** (container healthcheck on `http://127.0.0.1:8080/health`). On this Windows laptop the browser URL is **http://127.0.0.1:8080**; `http://localhost:8080` is reset by `wslrelay` on IPv6. Upload bronze from the **host** (`uv run python lake/upload_bronze.py` uses `localhost:9000`). DAG tasks use `http://minio:9000`. Do not add FastAPI or Next.js to that Compose file.
+- `cd zoomcamp && docker compose up -d --wait` starts **MinIO + Airflow** (container healthcheck on `http://127.0.0.1:8080/health`). Redpanda is separate: `docker compose up -d redpanda`; host Kafka clients use **`127.0.0.1:19092`**, not `localhost` (same IPv6/`wslrelay` issue as Airflow). On this Windows laptop the Airflow browser URL is **http://127.0.0.1:8080**. Upload bronze from the **host** (`uv run python lake/upload_bronze.py` uses `localhost:9000`). DAG tasks use `http://minio:9000`. Do not add FastAPI or Next.js to that Compose file.
 - Phase 1 compute is one Azure VM from a **$100 credit** ([ADR 0002](./decisions/0002-azure-credit-vm.md)). Laptop slice **before** `terraform apply`. Lake stays MinIO — do not add Azure Blob. Deallocate the VM when idle. See [cloud-and-free-demo.md](./cloud-and-free-demo.md).
 - Next.js must not embed `MOTHERDUCK_TOKEN`.
