@@ -87,6 +87,8 @@ uv sync --all-groups
 uv run pytest
 ```
 
+**CI also runs** (no MotherDuck token): from `zoomcamp/transitPule_dbt`, `uv run dbt parse --profiles-dir . --target dev` — compiles the project against the local DuckDB **dev** profile (8 models, 19 data tests in the manifest).
+
 **Target (not all shipped yet):**
 
 ```bash
