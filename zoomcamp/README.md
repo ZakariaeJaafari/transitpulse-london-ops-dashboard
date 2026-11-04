@@ -21,7 +21,7 @@ Commands below assume you are **in this folder** (`zoomcamp/`).
 ```bash
 make up          # docker compose up -d --build --wait
 make test        # uv sync --all-groups && uv run pytest
-make dbt-build   # .env next to the Makefile; dbt run (+line_status_snapshot +weather_hourly +arrivals_by_line +arrival_updates) then test on those marts
+make dbt-build   # .env next to the Makefile; dbt build (+line_status_snapshot +weather_hourly +arrivals_by_line +arrival_updates + contract test)
 ```
 
 **As-built (local laptop):**

@@ -59,3 +59,5 @@ zack-transitpulse.pub
 *.duckdb.wal
 zoomcamp/data/*
 !zoomcamp/data/.gitkeep
+
+.bruin.yml

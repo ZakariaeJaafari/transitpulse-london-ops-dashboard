@@ -55,9 +55,9 @@ Run `manual__2026-11-01T16:57:47+00:00` succeeded (dbt created `marts.staging_we
 DAG `arrivals_by_line` (`zoomcamp/dags/arrivals_by_line.py`) — warehouse half only (event silver JSON already on MinIO; no Flink or Redpanda in the DAG):
 
 1. `load_arrival_updates` — `uv run python ingest/arrival_updates_dlt.py` (reads `silver/arrival_updates/obs_date=2026-11-01/arrival_updates.json`, writes sibling Parquet, dlt `replace` → `bronze.arrival_updates`; in Compose `MINIO_ENDPOINT=http://minio:9000`).
-2. `build_arrivals_mart` — `uv run dbt run --profiles-dir . --target motherduck --select +arrivals_by_line +arrival_updates --no-partial-parse`. Builds `staging_arrival_updates`, `arrival_updates`, `staging_arrivals_by_line`, and `arrivals_by_line` (line summary groups from event staging, not `bronze.arrivals_by_line`).
+2. `build_arrivals_mart` — `uv run dbt build --profiles-dir . --target motherduck --select +arrivals_by_line +arrival_updates arrivals_by_line_matches_updates --no-partial-parse`. Builds four staging/mart tables, runs mart `not_null` / `unique` tests, then singular test `arrivals_by_line_matches_updates` (13 data tests).
 
-Run `manual__2026-11-04T15:55:31+00:00` succeeded (load log four bronze rows; dbt `PASS=4`). Prior run `manual__2026-11-04T13:40:38+00:00` used Flink-summary dlt (`PASS=2`).
+Run `manual__2026-11-04T16:21:44+00:00` succeeded (load four bronze rows; `dbt build` log 13 data tests pass, singular `arrivals_by_line_matches_updates` included). Prior run `manual__2026-11-04T15:55:31+00:00` used `dbt run` only (`PASS=4`).
 
 Both tasks export `motherduck_token` from `MOTHERDUCK_TOKEN`. Prerequisite for the Tube DAG: host `uv run python lake/upload_bronze.py` after MinIO is up (host endpoint `http://localhost:9000`). Prerequisite for `arrivals_by_line`: host or prior stream/lake steps must have placed `silver/arrival_updates/…/arrival_updates.json` on MinIO (`arrivals_by_line_dlt.py` remains for manual Flink-summary loads).
 
@@ -83,7 +83,7 @@ DAG `transit_batch` (`zoomcamp/dags/transit_batch.py`) — one manual chain (sch
 | `zoomcamp/ingest/tfl_line_status_dlt.py` | MinIO `bronze/tfl_line_status/2026/10/27/tube_line.json` | MotherDuck `transitpulse.bronze.tfl_line_status` (+ nested dlt tables) |
 | `zoomcamp/ingest/weather_hourly_dlt.py` | `sample_data/london_weather_2026-10-27.json` | MotherDuck `transitpulse.bronze.weather_hourly` (one row per hourly array index) |
 
-dbt: `models/staging/staging_line_status.sql` (Tube picker), `staging_weather_hourly.sql` (London timezone cast from bronze), `staging_arrival_updates.sql` (`DISTINCT` from `bronze.arrival_updates` to collapse duplicate sample publish), and `staging_arrivals_by_line.sql` (`GROUP BY` from `staging_arrival_updates`; mart no longer reads `bronze.arrivals_by_line`). Marts `line_status_snapshot`, `weather_hourly`, `arrivals_by_line`, and `arrival_updates` are thin `ref()` selects. On the `motherduck` target staging + mart models are tables in schema `marts`. Laptop `make dbt-build`: `+line_status_snapshot +weather_hourly +arrivals_by_line +arrival_updates` then tests on those marts.
+dbt: `models/staging/staging_line_status.sql` (Tube picker), `staging_weather_hourly.sql` (London timezone cast from bronze), `staging_arrival_updates.sql` (`DISTINCT` from `bronze.arrival_updates` to collapse duplicate sample publish), and `staging_arrivals_by_line.sql` (`GROUP BY` from `staging_arrival_updates`; mart no longer reads `bronze.arrivals_by_line`). Marts `line_status_snapshot`, `weather_hourly`, `arrivals_by_line`, and `arrival_updates` are thin `ref()` selects. On the `motherduck` target staging + mart models are tables in schema `marts`. Laptop `make dbt-build`: single `dbt build --select +line_status_snapshot +weather_hourly +arrivals_by_line +arrival_updates arrivals_by_line_matches_updates --no-partial-parse` (8 models, 19 data tests interleaved like the arrivals DAG).
 
 ## Vertical slice (Phase 1)
 

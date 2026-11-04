@@ -5,7 +5,12 @@ from __future__ import annotations
 import streamlit as st
 
 from charts import arrivals, line_status, weather
-from data import load_arrivals_by_line, load_line_status, load_weather
+from data import (
+    load_arrival_updates,
+    load_arrivals_by_line,
+    load_line_status,
+    load_weather,
+)
 
 
 def main() -> None:
@@ -15,6 +20,7 @@ def main() -> None:
     lines_df = load_line_status()
     weather_df = load_weather()
     arrivals_df = load_arrivals_by_line()
+    arrival_updates_df = load_arrival_updates()
 
     col_status, col_weather = st.columns(2)
     with col_status:
@@ -22,7 +28,7 @@ def main() -> None:
     with col_weather:
         weather.render(weather_df)
 
-    arrivals.render(arrivals_df)
+    arrivals.render(arrivals_df, arrival_updates_df)
 
     st.divider()
     st.caption(

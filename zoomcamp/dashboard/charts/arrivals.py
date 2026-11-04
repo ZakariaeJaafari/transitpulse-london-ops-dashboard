@@ -9,7 +9,7 @@ import streamlit as st
 from labels import line_label
 
 
-def render(arrivals_df: pd.DataFrame) -> None:
+def render(arrivals_df: pd.DataFrame, arrival_updates_df: pd.DataFrame) -> None:
     if arrivals_df.empty:
         st.warning("`marts.arrivals_by_line` has no rows on MotherDuck.")
 
@@ -43,3 +43,28 @@ def render(arrivals_df: pd.DataFrame) -> None:
         .properties(height=max(180, 48 * len(plot_arrivals)))
     )
     st.altair_chart(arrivals_chart, use_container_width=True)
+
+    if arrival_updates_df.empty:
+        st.warning("`marts.arrival_updates` has no rows on MotherDuck.")
+        return
+
+    st.caption(
+        "Each row is one arrival prediction. "
+        "time_to_station_sec is TfL timeToStation, not timetable delay."
+    )
+    table_df = arrival_updates_df.copy()
+    table_df["line"] = table_df["line_id"].map(line_label)
+    st.dataframe(
+        table_df[
+            [
+                "line",
+                "stop_id",
+                "vehicle_id",
+                "towards",
+                "time_to_station_sec",
+                "expected_arrival",
+            ]
+        ],
+        use_container_width=True,
+        hide_index=True,
+    )

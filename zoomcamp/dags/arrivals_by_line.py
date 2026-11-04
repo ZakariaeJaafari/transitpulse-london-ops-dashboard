@@ -1,4 +1,4 @@
-"""Orchestrate arrival_updates bronze load (dlt) and arrival marts (dbt)."""
+"""Orchestrate arrival_updates bronze load (dlt) and dbt build (marts + contract tests)."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ default_args = {
 with DAG(
     dag_id="arrivals_by_line",
     default_args=default_args,
-    description="MinIO silver arrival_updates JSON → dlt → dbt arrival_updates + arrivals_by_line",
+    description="MinIO silver arrival_updates JSON → dlt → dbt build (marts + contract tests)",
     schedule=None,
     start_date=datetime(2026, 11, 1),
     catchup=False,
@@ -41,8 +41,9 @@ with DAG(
         bash_command=(
             f"cd {ZOOMCAMP_ROOT}/transitPule_dbt && "
             'export motherduck_token="$MOTHERDUCK_TOKEN" && '
-            "uv run dbt run --profiles-dir . --target motherduck "
-            "--select +arrivals_by_line +arrival_updates --no-partial-parse"
+            "uv run dbt build --profiles-dir . --target motherduck "
+            "--select +arrivals_by_line +arrival_updates arrivals_by_line_matches_updates "
+            "--no-partial-parse"
         ),
     )
 
