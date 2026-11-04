@@ -59,3 +59,30 @@ models:
         description: Hourly precipitation total in mm.
       - name: wind_speed_10m
         description: Wind speed at 10 m in km/h.
+
+  - name: arrivals_by_line
+    description: >
+      Grain: one row per line_id for this replace load. Flink aggregate summary
+      per Tube line from bronze.arrivals_by_line (via staging). avg_predicted_seconds
+      is the mean of TfL timeToStation predictions, not timetable delay. n is the
+      Flink count of those predictions for the line.
+    columns:
+      - name: line_id
+        description: TfL line identifier from the silver aggregate.
+        tests:
+          - not_null
+          - unique
+      - name: n
+        description: Number of arrival predictions Flink counted for this line.
+        tests:
+          - not_null
+      - name: avg_predicted_seconds
+        description: >
+          Mean of TfL timeToStation (predicted seconds until train at stop), not
+          delay vs timetable.
+        tests:
+          - not_null
+      - name: obs_date
+        description: Observation partition date (2026-11-01 for the demo load).
+        tests:
+          - not_null

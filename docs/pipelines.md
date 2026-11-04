@@ -74,7 +74,7 @@ DAG `transit_batch` (`zoomcamp/dags/transit_batch.py`) — one manual chain (sch
 | `zoomcamp/ingest/tfl_line_status_dlt.py` | MinIO `bronze/tfl_line_status/2026/10/27/tube_line.json` | MotherDuck `transitpulse.bronze.tfl_line_status` (+ nested dlt tables) |
 | `zoomcamp/ingest/weather_hourly_dlt.py` | `sample_data/london_weather_2026-10-27.json` | MotherDuck `transitpulse.bronze.weather_hourly` (one row per hourly array index) |
 
-dbt: `models/staging/staging_line_status.sql` (Tube picker) and `models/staging/staging_weather_hourly.sql` (London timezone cast from bronze). Marts `line_status_snapshot` and `weather_hourly` are thin `ref()` selects. On the `motherduck` target all four models are tables in schema `marts`. Laptop `make dbt-build`: run PASS=4, test PASS=6.
+dbt: `models/staging/staging_line_status.sql` (Tube picker), `staging_weather_hourly.sql` (London timezone cast from bronze), and `staging_arrivals_by_line.sql` (line summary from `bronze.arrivals_by_line`; omits `_dlt_*`). Marts `line_status_snapshot`, `weather_hourly`, and `arrivals_by_line` are thin `ref()` selects. On the `motherduck` target staging + mart models are tables in schema `marts`. Laptop `make dbt-build`: `+line_status_snapshot +weather_hourly +arrivals_by_line` then tests on the three marts.
 
 ## Vertical slice (Phase 1)
 

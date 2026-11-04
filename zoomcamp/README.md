@@ -21,7 +21,7 @@ Commands below assume you are **in this folder** (`zoomcamp/`).
 ```bash
 make up          # docker compose up -d --build --wait
 make test        # uv sync --all-groups && uv run pytest
-make dbt-build   # .env next to the Makefile; dbt run (+line_status_snapshot +weather_hourly) then test (PASS=4 / PASS=6)
+make dbt-build   # .env next to the Makefile; dbt run (+line_status_snapshot +weather_hourly +arrivals_by_line) then test on those marts
 ```
 
 **As-built (local laptop):**
@@ -74,7 +74,7 @@ cd ..
 uv run streamlit run dashboard/app.py
 ```
 
-Local file `data/transitpulse.duckdb` is for dbt **dev** only. **dlt** loads bronze into MotherDuck `transitpulse.bronze.*`; dbt **motherduck** builds the two staging tables and two marts in schema `marts`. Streamlit reads **MotherDuck marts only** (`line_status_snapshot`, `weather_hourly`).
+Local file `data/transitpulse.duckdb` is for dbt **dev** only. **dlt** loads bronze into MotherDuck `transitpulse.bronze.*`; dbt **motherduck** builds staging tables and marts in schema `marts`. Streamlit reads **MotherDuck marts only** — graded tiles: `line_status_snapshot`, `weather_hourly`; after the stream slice, a third section charts `arrivals_by_line` (mean predicted seconds by line).
 
 Tests (no `.env` required):
 

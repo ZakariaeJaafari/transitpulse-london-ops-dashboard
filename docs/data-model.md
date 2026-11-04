@@ -85,5 +85,7 @@ MotherDuck/DuckDB: partition **columns** + intentional `ORDER BY` / indexes. Pos
 | `marts.staging_weather_hourly` | one row per hour | Cast `bronze.weather_hourly.time` to Europe/London wall-clock `timestamp`; passes through Open-Meteo measure columns. Table in schema `marts` on the `motherduck` target. |
 | `marts.weather_hourly` | one row per hour | `select` from `staging_weather_hourly` (`time`, `temperature_2m`, `precipitation`, `wind_speed_10m`). |
 | `bronze.arrivals_by_line` | one row per `line_id` | dlt `replace` from silver `arrivals_by_line.parquet`. Columns `line_id`, `n`, `avg_predicted_seconds`, `obs_date`. `obs_date` is `2026-11-01` from the object path (not a Parquet column). Line summary, not one arrival per row. `avg_predicted_seconds` is still TfL predicted seconds, not timetable delay. |
+| `marts.staging_arrivals_by_line` | one row per `line_id` | `select` from `bronze.arrivals_by_line` (`line_id`, `n`, `avg_predicted_seconds`, `obs_date` as date). Omits `_dlt_*`. Table in schema `marts` on the `motherduck` target. |
+| `marts.arrivals_by_line` | one row per `line_id` | `select` from `staging_arrivals_by_line`. `avg_predicted_seconds` is mean TfL predicted seconds, not timetable delay; `n` is Flink prediction count. Dashboard may read this mart. |
 
 Column docs and mart tests: `zoomcamp/transitPule_dbt/models/marts/schema.yml` (tests apply to the marts, not staging). All four objects are tables in MotherDuck on the `motherduck` target. The dbt `dev` target still builds views in the local DuckDB file. See [status.md](./status.md).
