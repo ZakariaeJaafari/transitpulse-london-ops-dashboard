@@ -8,7 +8,7 @@ Dataset (TfL + Open-Meteo) → **data lake (MinIO)** → **warehouse (MotherDuck
 
 **Batch (this slice):** Airflow DAGs `tube_status`, `weather_hourly`, and combined `transit_batch` run dlt into MotherDuck `transitpulse.bronze`. dbt `--target motherduck` builds staging then mart for each tile: `marts.staging_line_status` → `marts.line_status_snapshot` (`--select +line_status_snapshot`) and `marts.staging_weather_hourly` → `marts.weather_hourly` (`--select +weather_hourly`). The Tube load reads MinIO. The weather load reads `sample_data/`. Use `transit_batch` for one trigger: tube bronze → line-status silver Parquet on MinIO → weather bronze → both staging models and both marts.
 
-**Stream (later):** Redpanda and PyFlink stay a target. No stream producer is in `zoomcamp/` yet. PySpark is not in this slice.
+**Stream (laptop, partial):** sample arrivals land on Redpanda, and a PyFlink batch aggregate writes local JSON. `lake/arrivals_by_line_to_silver.py` copies the newest `part-*` onto MinIO silver JSON. `lake/arrivals_by_line_to_parquet.py` writes typed Parquet beside that JSON. Flink does not write S3 itself. PySpark is not in this slice.
 
 ![TransitPulse Tube status and London weather tiles](dashboard/tiles.png)
 
@@ -40,10 +40,17 @@ docker compose exec redpanda rpk topic list
 uv run python ingest/publish_sample_arrivals.py
 uv run python ingest/consume_sample_arrivals.py
 docker compose exec redpanda rpk topic consume tfl.arrivals -o start -n 2 -f 'key=%k%n%v%n'
+# PyFlink (Java 17+; download Kafka connector JAR — see stream/jars/README.md):
+uv run python stream/print_arrivals_sample.py
+uv run python stream/print_arrivals_topic.py   # Redpanda up; reads tfl.arrivals once (bounded)
+uv run python stream/print_arrivals_by_line.py # batch SQL: one row per line_id (avg predicted sec)
+uv run python stream/write_arrivals_by_line.py # same aggregate → stream/output/arrivals_by_line/
 uv sync
 uv run python lake/upload_bronze.py   # host → http://localhost:9000
 uv run python lake/line_status_to_silver.py   # bronze JSON → silver Parquet (DuckDB); uses 127.0.0.1 if localhost fails
-# Console: http://localhost:9001 → bucket transitpulse → bronze/… and silver/line_status/…
+uv run python lake/arrivals_by_line_to_silver.py  # newest part-* → silver/arrivals_by_line/…json
+uv run python lake/arrivals_by_line_to_parquet.py  # JSON lines → typed Parquet; JSON object stays
+# Console: http://localhost:9001 → bucket transitpulse → bronze/…, silver/line_status/…, and silver/arrivals_by_line/…
 # Airflow UI: http://127.0.0.1:8080 — login admin / admin (override AIRFLOW_WWW_USER / AIRFLOW_WWW_USER_PASSWORD in .env)
 # On this Windows host, http://localhost:8080 is reset (IPv6 localhost hits wslrelay). Use 127.0.0.1.
 # Unpause DAG transit_batch (or tube_status / weather_hourly separately)

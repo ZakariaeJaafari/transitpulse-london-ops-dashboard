@@ -16,6 +16,10 @@ crash.*.log
 # Claude Code local overlay (not shared)
 CLAUDE.local.md
 
+# PyFlink connector binaries (see zoomcamp/stream/jars/README.md)
+zoomcamp/stream/jars/*.jar
+zoomcamp/stream/output/
+
 # Python
 .venv/
 __pycache__/

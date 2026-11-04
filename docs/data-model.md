@@ -73,6 +73,8 @@ MotherDuck/DuckDB: partition **columns** + intentional `ORDER BY` / indexes. Pos
 | Path | Grain | Notes |
 |------|-------|--------|
 | `silver/line_status/status_date=2026-10-27/line_status.parquet` | line × `obs_ts` | Typed Parquet from bronze via `line_status_proxy.line_status_row`; no `stop_id` |
+| `silver/arrivals_by_line/obs_date=2026-11-01/arrivals_by_line.json` | one row per `line_id` | JSON lines copied from the newest Flink `part-*` (`n`, `avg_predicted_seconds`). `avg_predicted_seconds` is the mean of TfL `timeToStation` predictions, not timetable delay. Partition `obs_date`. Left in place when Parquet is written. |
+| `silver/arrivals_by_line/obs_date=2026-11-01/arrivals_by_line.parquet` | one row per `line_id` | Typed Parquet from that JSON via DuckDB `read_ndjson`. Columns `line_id` VARCHAR, `n` BIGINT, `avg_predicted_seconds` DOUBLE (still TfL predicted seconds, not timetable delay). |
 
 ### As-built (MotherDuck `transitpulse`)
 
