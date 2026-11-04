@@ -52,7 +52,14 @@ DAG `weather_hourly` (`zoomcamp/dags/weather_hourly.py`):
 
 Run `manual__2026-11-01T16:57:47+00:00` succeeded (dbt created `marts.staging_weather_hourly` then `marts.weather_hourly`, 16:58:05 UTC).
 
-Both tasks export `motherduck_token` from `MOTHERDUCK_TOKEN`. Prerequisite for the Tube DAG: host `uv run python lake/upload_bronze.py` after MinIO is up (host endpoint `http://localhost:9000`).
+DAG `arrivals_by_line` (`zoomcamp/dags/arrivals_by_line.py`) — warehouse half only (Parquet already on MinIO; no Flink or Redpanda):
+
+1. `load_arrivals_bronze` — `uv run python ingest/arrivals_by_line_dlt.py` (reads `silver/arrivals_by_line/obs_date=2026-11-01/arrivals_by_line.parquet`; in Compose `MINIO_ENDPOINT=http://minio:9000`; dlt writes MotherDuck `transitpulse.bronze.arrivals_by_line`).
+2. `build_arrivals_mart` — `uv run dbt run --profiles-dir . --target motherduck --select +arrivals_by_line --no-partial-parse`. The `+` builds `staging_arrivals_by_line` before `arrivals_by_line`.
+
+Run `manual__2026-11-04T13:40:38+00:00` succeeded (dbt `PASS=2`).
+
+Both tasks export `motherduck_token` from `MOTHERDUCK_TOKEN`. Prerequisite for the Tube DAG: host `uv run python lake/upload_bronze.py` after MinIO is up (host endpoint `http://localhost:9000`). Prerequisite for `arrivals_by_line`: host or prior stream/lake steps must have placed the silver Parquet on MinIO.
 
 DAG `transit_batch` (`zoomcamp/dags/transit_batch.py`) — one manual chain (schedule `None`). Run `manual__2026-11-01T17:00:43+00:00` succeeded (start 17:00:44 UTC, end 17:01:25 UTC): silver Parquet, both bronze loads, then dbt with `+line_status_snapshot` and `+weather_hourly` (all four `marts.*` tables). Run `manual__2026-11-01T16:42:06+00:00` succeeded before weather staging (`+line_status_snapshot` only). Run `manual__2026-11-01T16:20:55+00:00` added `write_line_status_silver`. The two single-entity DAGs stay for separate runs (`tube_status` uses `+line_status_snapshot`; neither writes silver):
 
