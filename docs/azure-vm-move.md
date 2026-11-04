@@ -21,7 +21,7 @@ These already ran locally and stayed the source of truth for the move:
 - dbt model `marts.line_status_snapshot` in `zoomcamp/transitPule_dbt/` against `zoomcamp/data/transitpulse.duckdb`.
 - Airflow DAG `tube_status` (`load_tube_bronze` then `build_line_status_mart`) green on local Compose.
 - Streamlit in `zoomcamp/dashboard/` reading local `marts.*`.
-- `pytest` in `zoomcamp/tests/` and `.github/workflows/ci.yml` (also `dbt parse --target dev` in `zoomcamp/transitPule_dbt/` — no warehouse token in CI).
+- `pytest` in `zoomcamp/tests/` and `.github/workflows/ci.yml` (also `dbt parse`, `docker compose config`, and Airflow `DagBag` import in the `2.10.4-python3.12` image — no `.env`, no warehouse token, no webserver).
 
 ## Done — create the VM
 

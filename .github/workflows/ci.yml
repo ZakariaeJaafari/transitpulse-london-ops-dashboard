@@ -25,3 +25,15 @@ jobs:
       - name: dbt parse (local DuckDB, no warehouse)
         working-directory: zoomcamp/transitPule_dbt
         run: uv run dbt parse --profiles-dir . --target dev
+
+      - name: Docker Compose config (no .env, no start)
+        run: MINIO_ROOT_USER=ci MINIO_ROOT_PASSWORD=ci docker compose config --quiet
+
+      - name: Airflow DAG import (same base image, no webserver)
+        run: |
+          docker run --rm \
+            -e AIRFLOW__CORE__LOAD_EXAMPLES=false \
+            -v "$PWD:/opt/transitpulse/zoomcamp" \
+            -w /opt/transitpulse/zoomcamp \
+            apache/airflow:2.10.4-python3.12 \
+            python -c "from airflow.models import DagBag; bag = DagBag('dags', include_examples=False); import_errors = bag.import_errors; import sys; sys.exit(repr(import_errors)) if import_errors else print('\n'.join(sorted(bag.dags)))"

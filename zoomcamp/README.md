@@ -87,7 +87,7 @@ uv sync --all-groups
 uv run pytest
 ```
 
-**CI also runs** (no MotherDuck token): from `zoomcamp/transitPule_dbt`, `uv run dbt parse --profiles-dir . --target dev` — compiles the project against the local DuckDB **dev** profile (8 models, 19 data tests in the manifest).
+**CI also runs** (no MotherDuck token, no `.env`, no Airflow webserver): `dbt parse --target dev`; `docker compose config --quiet` with `MINIO_ROOT_USER=ci` / `MINIO_ROOT_PASSWORD=ci`; `DagBag('dags')` in `apache/airflow:2.10.4-python3.12` with the repo mounted at `/opt/transitpulse/zoomcamp`.
 
 **Target (not all shipped yet):**
 
