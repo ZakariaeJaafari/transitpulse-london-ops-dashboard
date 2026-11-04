@@ -10,3 +10,4 @@ sources:
       - name: _dlt_loads
       - name: weather_hourly
       - name: arrivals_by_line
+      - name: arrival_updates

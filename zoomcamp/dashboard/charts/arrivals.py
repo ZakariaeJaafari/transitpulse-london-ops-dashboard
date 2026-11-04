@@ -16,7 +16,7 @@ def render(arrivals_df: pd.DataFrame) -> None:
     st.subheader("Predicted seconds by line for the 2026-11-01 sample")
     st.caption(
         "Mean of TfL timeToStation predictions (not timetable delay). "
-        "n is the number of predictions Flink counted per line."
+        "n is the number of distinct predictions for that line."
     )
     if arrivals_df.empty:
         return

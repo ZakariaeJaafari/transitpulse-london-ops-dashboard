@@ -6,7 +6,7 @@ This folder is the **DataTalksClub DE Zoomcamp course project**.
 
 Dataset (TfL + Open-Meteo) → **data lake (MinIO)** → **warehouse (MotherDuck)** → **dbt** → **dashboard (2 tiles)**.
 
-**Batch (this slice):** Airflow DAGs `tube_status`, `weather_hourly`, `arrivals_by_line`, and combined `transit_batch` run dlt into MotherDuck `transitpulse.bronze`. DAG `arrivals_by_line` reloads MinIO silver Parquet and runs dbt `+arrivals_by_line` (no Flink/Redpanda). dbt `--target motherduck` builds staging then mart for each tile: `marts.staging_line_status` → `marts.line_status_snapshot` (`--select +line_status_snapshot`) and `marts.staging_weather_hourly` → `marts.weather_hourly` (`--select +weather_hourly`). The Tube load reads MinIO. The weather load reads `sample_data/`. Use `transit_batch` for one trigger: tube bronze → line-status silver Parquet on MinIO → weather bronze → both staging models and both marts.
+**Batch (this slice):** Airflow DAGs `tube_status`, `weather_hourly`, `arrivals_by_line`, and combined `transit_batch` run dlt into MotherDuck `transitpulse.bronze`. DAG `arrivals_by_line` reloads MinIO silver `arrival_updates` JSON (dlt) and runs dbt `+arrivals_by_line +arrival_updates` (no Flink/Redpanda in the DAG). dbt `--target motherduck` builds staging then mart for each tile: `marts.staging_line_status` → `marts.line_status_snapshot` (`--select +line_status_snapshot`) and `marts.staging_weather_hourly` → `marts.weather_hourly` (`--select +weather_hourly`). The Tube load reads MinIO. The weather load reads `sample_data/`. Use `transit_batch` for one trigger: tube bronze → line-status silver Parquet on MinIO → weather bronze → both staging models and both marts.
 
 **Stream (laptop, partial):** sample arrivals land on Redpanda, and a PyFlink batch aggregate writes local JSON. `lake/arrivals_by_line_to_silver.py` copies the newest `part-*` onto MinIO silver JSON. `lake/arrivals_by_line_to_parquet.py` writes typed Parquet beside that JSON. `ingest/arrivals_by_line_dlt.py` loads that Parquet into MotherDuck `bronze.arrivals_by_line` (line summary; `avg_predicted_seconds` is still TfL predicted seconds). Flink does not write S3 itself. PySpark is not in this slice.
 
@@ -21,7 +21,7 @@ Commands below assume you are **in this folder** (`zoomcamp/`).
 ```bash
 make up          # docker compose up -d --build --wait
 make test        # uv sync --all-groups && uv run pytest
-make dbt-build   # .env next to the Makefile; dbt run (+line_status_snapshot +weather_hourly +arrivals_by_line) then test on those marts
+make dbt-build   # .env next to the Makefile; dbt run (+line_status_snapshot +weather_hourly +arrivals_by_line +arrival_updates) then test on those marts
 ```
 
 **As-built (local laptop):**
@@ -45,12 +45,15 @@ uv run python stream/print_arrivals_sample.py
 uv run python stream/print_arrivals_topic.py   # Redpanda up; reads tfl.arrivals once (bounded)
 uv run python stream/print_arrivals_by_line.py # batch SQL: one row per line_id (avg predicted sec)
 uv run python stream/write_arrivals_by_line.py # same aggregate → stream/output/arrivals_by_line/
+uv run python stream/write_arrival_updates.py  # one JSON row per prediction → stream/output/arrival_updates/
 uv sync
 uv run python lake/upload_bronze.py   # host → http://localhost:9000
 uv run python lake/line_status_to_silver.py   # bronze JSON → silver Parquet (DuckDB); uses 127.0.0.1 if localhost fails
 uv run python lake/arrivals_by_line_to_silver.py  # newest part-* → silver/arrivals_by_line/…json
+uv run python lake/arrival_updates_to_silver.py   # newest part-* → silver/arrival_updates/…json
 uv run python lake/arrivals_by_line_to_parquet.py  # JSON lines → typed Parquet; JSON object stays
 uv run python ingest/arrivals_by_line_dlt.py  # that Parquet → MotherDuck bronze.arrivals_by_line (loads .env)
+uv run python ingest/arrival_updates_dlt.py   # event JSON → Parquet → bronze.arrival_updates (loads .env)
 # Console: http://localhost:9001 → bucket transitpulse → bronze/…, silver/line_status/…, and silver/arrivals_by_line/…
 # Airflow UI: http://127.0.0.1:8080 — login admin / admin (override AIRFLOW_WWW_USER / AIRFLOW_WWW_USER_PASSWORD in .env)
 # On this Windows host, http://localhost:8080 is reset (IPv6 localhost hits wslrelay). Use 127.0.0.1.

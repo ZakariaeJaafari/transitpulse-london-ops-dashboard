@@ -62,24 +62,65 @@ models:
 
   - name: arrivals_by_line
     description: >
-      Grain: one row per line_id for this replace load. Flink aggregate summary
-      per Tube line from bronze.arrivals_by_line (via staging). avg_predicted_seconds
+      Grain: one row per line_id and obs_date. Summary grouped from
+      staging_arrival_updates (distinct arrival predictions). avg_predicted_seconds
       is the mean of TfL timeToStation predictions, not timetable delay. n is the
-      Flink count of those predictions for the line.
+      distinct prediction count for that line on obs_date.
     columns:
       - name: line_id
-        description: TfL line identifier from the silver aggregate.
+        description: TfL line identifier from the line summary.
         tests:
           - not_null
           - unique
       - name: n
-        description: Number of arrival predictions Flink counted for this line.
+        description: Number of distinct arrival predictions for this line on obs_date.
         tests:
           - not_null
       - name: avg_predicted_seconds
         description: >
           Mean of TfL timeToStation (predicted seconds until train at stop), not
           delay vs timetable.
+        tests:
+          - not_null
+      - name: obs_date
+        description: Observation partition date (2026-11-01 for the demo load).
+        tests:
+          - not_null
+
+  - name: arrival_updates
+    description: >
+      Grain: one distinct arrival prediction per stop, line, vehicle, and expected
+      arrival time. From bronze.arrival_updates via staging, which removed the
+      duplicate sample publish (two identical Kafka batches). time_to_station_sec
+      is TfL timeToStation (predicted seconds until train at stop), not timetable
+      delay.
+    columns:
+      - name: stop_id
+        description: TfL NaPTAN stop identifier (curated StopPoint subset).
+        tests:
+          - not_null
+      - name: line_id
+        description: TfL line identifier.
+        tests:
+          - not_null
+      - name: vehicle_id
+        description: TfL vehicle identifier for this prediction.
+        tests:
+          - not_null
+      - name: expected_arrival
+        description: TfL expected arrival timestamp (ISO 8601).
+        tests:
+          - not_null
+      - name: time_to_station_sec
+        description: >
+          TfL timeToStation in seconds (prediction until train at stop), not delay
+          vs timetable.
+        tests:
+          - not_null
+      - name: towards
+        description: Destination name shown on the platform board.
+      - name: obs_ts
+        description: Observation timestamp when the poll was taken.
         tests:
           - not_null
       - name: obs_date

@@ -1,17 +1,15 @@
 {{ config(materialized='table' if target.name == 'motherduck' else 'view') }}
 
 /*
-  Bronze columns (DESCRIBE bronze.arrivals_by_line):
-  line_id, n, avg_predicted_seconds, obs_date, _dlt_load_id, _dlt_id
-
-  Line summary from Flink aggregate (one row per line_id), not one arrival per row.
+  Line summary grouped from staging_arrival_updates (distinct predictions per line).
   avg_predicted_seconds is the mean of TfL timeToStation predictions, not timetable delay.
-  n is how many predictions Flink counted for that line.
+  n is the count of distinct predictions for that line and obs_date.
 */
 
 select
     line_id,
-    n,
-    avg_predicted_seconds,
-    cast(obs_date as date) as obs_date
-from {{ source('bronze', 'arrivals_by_line') }}
+    cast(count(*) as bigint) as n,
+    cast(avg(time_to_station_sec) as double) as avg_predicted_seconds,
+    obs_date
+from {{ ref('staging_arrival_updates') }}
+group by line_id, obs_date
