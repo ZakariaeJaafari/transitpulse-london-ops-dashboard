@@ -44,4 +44,4 @@ def render(weather_df: pd.DataFrame) -> None:
         )
         .properties(height=420)
     )
-    st.altair_chart(precip_chart, use_container_width=True)
+    st.altair_chart(precip_chart, width="stretch")

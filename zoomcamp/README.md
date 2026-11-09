@@ -8,7 +8,7 @@ Dataset (TfL + Open-Meteo) → **data lake (MinIO)** → **warehouse (MotherDuck
 
 **Batch (this slice):** Airflow DAGs `tube_status`, `weather_hourly`, `arrivals_by_line`, and combined `transit_batch` run dlt into MotherDuck `transitpulse.bronze`. DAG `arrivals_by_line` reloads MinIO silver `arrival_updates` JSON (dlt) and runs dbt `+arrivals_by_line +arrival_updates` (no Flink/Redpanda in the DAG). dbt `--target motherduck` builds staging then mart for each tile: `marts.staging_line_status` → `marts.line_status_snapshot` (`--select +line_status_snapshot`) and `marts.staging_weather_hourly` → `marts.weather_hourly` (`--select +weather_hourly`). The Tube load reads MinIO. The weather load reads `sample_data/`. Use `transit_batch` for one trigger: tube bronze → line-status silver Parquet on MinIO → weather bronze → both staging models and both marts.
 
-**Stream (laptop, partial):** sample arrivals land on Redpanda, and a PyFlink batch aggregate writes local JSON. `lake/arrivals_by_line_to_silver.py` copies the newest `part-*` onto MinIO silver JSON. `lake/arrivals_by_line_to_parquet.py` writes typed Parquet beside that JSON. `ingest/arrivals_by_line_dlt.py` loads that Parquet into MotherDuck `bronze.arrivals_by_line` (line summary; `avg_predicted_seconds` is still TfL predicted seconds). Flink does not write S3 itself. PySpark is not in this slice.
+**Stream (laptop, partial):** the warehouse path is still the frozen Oxford Circus sample. Sample arrivals land on Redpanda. `stream/write_arrival_updates.py` reads the topic from the earliest offset and writes local JSON; silver upload and `ingest/arrival_updates_dlt.py` load that into `bronze.arrival_updates`. The line mart is a dbt `GROUP BY` of those events (Victoria `n=1` at 65 seconds, Bakerloo `n=1` at 123 seconds, `obs_date` 2026-11-01). `ingest/poll_live_arrivals.py` can append the current TfL board to the same topic. `stream/write_live_arrival_updates.py` writes the offset-409 slice to `stream/output/arrival_updates_live/`; that folder is not uploaded and is not the mart. Flink is not a Compose service and is not a continuous windowed job. Flink does not write S3 itself. PySpark is not in this slice. The older line-summary files (`arrivals_by_line_to_silver.py`, `arrivals_by_line_to_parquet.py`, `arrivals_by_line_dlt.py`) remain for a manual Flink-aggregate load. `avg_predicted_seconds` is still TfL predicted seconds.
 
 ![TransitPulse Tube status and London weather tiles](dashboard/tiles.png)
 
@@ -39,13 +39,18 @@ docker compose exec redpanda rpk topic list
 # Host Kafka bootstrap: 127.0.0.1:19092 (not localhost on this Windows host — IPv6/wslrelay)
 uv run python ingest/publish_sample_arrivals.py
 uv run python ingest/consume_sample_arrivals.py
+uv run python ingest/poll_live_arrivals.py   # current TfL board → tfl.arrivals; does not reload marts
+uv run python ingest/consume_new_arrivals.py # group transitpulse-arrivals-live; commits its cursor
+uv run python ingest/count_arrival_obs_ts.py # count by obs_ts; does not commit
 docker compose exec redpanda rpk topic consume tfl.arrivals -o start -n 2 -f 'key=%k%n%v%n'
 # PyFlink (Java 17+; download Kafka connector JAR — see stream/jars/README.md):
 uv run python stream/print_arrivals_sample.py
 uv run python stream/print_arrivals_topic.py   # Redpanda up; reads tfl.arrivals once (bounded)
 uv run python stream/print_arrivals_by_line.py # batch SQL: one row per line_id (avg predicted sec)
 uv run python stream/write_arrivals_by_line.py # same aggregate → stream/output/arrivals_by_line/
-uv run python stream/write_arrival_updates.py  # one JSON row per prediction → stream/output/arrival_updates/
+uv run python stream/write_arrival_updates.py  # earliest-offset; one JSON row per prediction → stream/output/arrival_updates/
+uv run python stream/write_live_arrival_updates.py  # offset 409 → stream/output/arrival_updates_live/ (not MinIO)
+uv run python stream/summarize_live_slice.py # line counts for that live folder only
 uv sync
 uv run python lake/upload_bronze.py   # host → http://localhost:9000
 uv run python lake/line_status_to_silver.py   # bronze JSON → silver Parquet (DuckDB); uses 127.0.0.1 if localhost fails
@@ -77,7 +82,7 @@ cd ..
 uv run streamlit run dashboard/app.py
 ```
 
-Local file `data/transitpulse.duckdb` is for dbt **dev** only. **dlt** loads bronze into MotherDuck `transitpulse.bronze.*`; dbt **motherduck** builds staging tables and marts in schema `marts`. Streamlit reads **MotherDuck marts only** — graded tiles: `line_status_snapshot`, `weather_hourly`; after the stream slice, a third section charts `arrivals_by_line` (mean predicted seconds by line).
+Local file `data/transitpulse.duckdb` is for dbt **dev** only. **dlt** loads bronze into MotherDuck `transitpulse.bronze.*`; dbt **motherduck** builds staging tables and marts in schema `marts`. Streamlit reads **MotherDuck marts only** — graded tiles: `line_status_snapshot`, `weather_hourly`; a third section charts `arrivals_by_line` and lists `arrival_updates` for the 2026-11-01 sample (mean predicted seconds by line, not the live file under `stream/output/arrival_updates_live/`). Chart and table calls use `width="stretch"`. On this Windows host open **http://127.0.0.1:8501**.
 
 Tests (no `.env` required):
 

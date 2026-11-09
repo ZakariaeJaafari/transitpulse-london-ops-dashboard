@@ -42,7 +42,7 @@ def render(arrivals_df: pd.DataFrame, arrival_updates_df: pd.DataFrame) -> None:
         )
         .properties(height=max(180, 48 * len(plot_arrivals)))
     )
-    st.altair_chart(arrivals_chart, use_container_width=True)
+    st.altair_chart(arrivals_chart, width="stretch")
 
     if arrival_updates_df.empty:
         st.warning("`marts.arrival_updates` has no rows on MotherDuck.")
@@ -65,6 +65,6 @@ def render(arrivals_df: pd.DataFrame, arrival_updates_df: pd.DataFrame) -> None:
                 "expected_arrival",
             ]
         ],
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
