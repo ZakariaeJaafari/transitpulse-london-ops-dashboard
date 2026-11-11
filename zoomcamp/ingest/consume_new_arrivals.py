@@ -38,6 +38,7 @@ def main() -> None:
     try:
         low, high = consumer.get_watermark_offsets(partition, timeout=10.0)
         if low < 0 or high < 0:
+            print(f"watermark low {low} high {high}")
             print("total 0")
             return
 
@@ -48,6 +49,7 @@ def main() -> None:
             start = committed.offset
 
         if start >= high:
+            print(f"start {start} high {high}")
             print("total 0")
             return
 

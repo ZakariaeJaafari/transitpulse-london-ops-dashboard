@@ -19,7 +19,7 @@ Prefer **Streamlit Community Cloud** for the public *graded* 2-tile demo. Next.j
 | 1 | Categorical | Disruption / delay-proxy share by Tube line (e.g. last 7 days) | Share of disrupted intervals by Tube line (last 7 days) |
 | 2 | Temporal | Daily reliability or mean delay proxy by `event_date` | Daily reliability trend — London Tube |
 
-Optional third (as-built on laptop): full-width bar chart from `marts.arrivals_by_line` plus a table of distinct predictions from `marts.arrival_updates` (2026-11-01 sample; captions state `timeToStation` is not timetable delay). Chart and table calls use `width="stretch"`. This section does not read `stream/output/arrival_updates_live/`. On 2026-11-09 `dbt show` still returned Victoria `n=1` at 65 seconds and Bakerloo `n=1` at 123 seconds. Graded peer review still counts the **two** column tiles only; `dashboard/tiles.png` stays the 2-tile screenshot.
+Optional third (as-built on laptop): full-width bar chart from `marts.arrivals_by_line` plus a table of distinct predictions from `marts.arrival_updates` (2026-11-01 sample; captions state `timeToStation` is not timetable delay). Chart and table calls use `width="stretch"`. This section does not read `stream/output/arrival_updates_live/`, `stream/output/arrival_updates_since_1970/`, `stream/output/arrival_updates_since_2163/`, or `stream/output/arrival_updates_appended.jsonl`. On 2026-11-10 `dbt show --no-partial-parse` still returned Victoria `n=1` at 65 seconds and Bakerloo `n=1` at 123 seconds. Graded peer review still counts the **two** column tiles only; `dashboard/tiles.png` stays the 2-tile screenshot.
 
 Requirements: clear titles, axis labels, footnote **Data provided by Transport for London** + Open-Meteo. Screenshots in README for peers.
 

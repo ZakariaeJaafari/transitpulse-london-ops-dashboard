@@ -68,6 +68,17 @@ def main() -> None:
             f"Missing Kafka connector JAR: {KAFKA_CONNECTOR_JAR}"
         )
 
+    existing_parts = list(OUTPUT_DIR.rglob("part-*"))
+    if existing_parts:
+        print(
+            f"Error: output already has {len(existing_parts)} part file(s) under "
+            f"{OUTPUT_DIR.relative_to(ZOOMCAMP_ROOT)}; "
+            "this job always reads from the earliest offset — delete the folder or use a "
+            "new path before re-running.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     output_uri = OUTPUT_DIR.as_uri()
 
